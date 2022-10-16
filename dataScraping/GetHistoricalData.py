@@ -1,25 +1,63 @@
 '''
+The class is responsible for fetching crypto related data
 
+Constructor is setting:
+    ticker: the symbol of the asset. ex: BTCUSDT
+    interval: how often should we get the data. ex 5m, 15m 20m, 1h etc
+
+It needs to implement two type of data fetching:
+    1. between two dates
+    2. and data from the current date to a lookback periodx
 
 '''
+from datetime import datetime
 
 import pandas as pd
 from binance.client import Client
+import sys
+
+from secret.SecretKeys import api_key, api_secret
+
+DATE_FORMAT = 'yyyy-mm-dd'
+COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume',
+               'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
+LOW_COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
+
+
+def validate(date_text):
+    try:
+        datetime.strptime(date_text, DATE_FORMAT)
+    except ValueError:
+        raise ValueError("Incorrect data format, should be YYYY-MM-DD")
+
 
 class GetHistoricalData:
-    api_key = 'RowNIh7ob9TxTu3V9xLKtDY9JD3x2e8k8xPGLtDfEd7ORxX3ZH9FNW4DbBcSAcTL'
-    api_secret = 'CaWH0MyeinSIAdqeE3XCVuF0SMqxEDcM40YS7COSt8w9sgy0RoZnfa4TZjhptVbG'
     frame = pd.DataFrame()
     client = Client(api_key, api_secret)
 
-    def __init__(self, ticker, interval):
+    def __init__(self, ticker, interval, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
         self.ticker = ticker
         self.interval = interval
         self.fileName = ticker + '-' + interval
+        if startDate == 'noStartDate' and endDate == 'noEndDate' and lookbackHours == '-1':
+            print("No parameters were given.\nPlease give a lookback period or tow dates!")
+            sys.exit()
+
+        if startDate != 'noStartDate' and endDate != 'noEndDate' and lookbackHours == '-1':
+            validate(startDate)
+            validate(endDate)
+            self.getDataBetweenDates(startDate, endDate)
+        elif lookbackHours != '-1':
+            self.getCurrentData(lookbackHours)
+        else:
+            print("something wrong with the parameters, please try again")
+            sys.exit()
+
+    def getDataFrame(self):
+        return self.frame
 
     def cleanDataFrame(self):
-        self.frame = self.frame.iloc[:, :6]
-        self.frame.columns = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
+        self.frame.columns = COLUMN_LIST
         self.frame.Time = pd.to_datetime(self.frame.Time, unit='ms')
         self.frame.Time = self.frame.Time + pd.Timedelta(hours=3)
         self.frame.Open = self.frame.Open.astype(float)
@@ -27,34 +65,32 @@ class GetHistoricalData:
         self.frame.Low = self.frame.Low.astype(float)
         self.frame.Close = self.frame.Close.astype(float)
 
-    def getDataBetweenDates(self, startdate, enddate):
+    def getDataBetweenDates(self, startDate, endDate):
         self.frame = pd.DataFrame(
-            self.client.get_historical_klines(symbol=self.ticker, start_str=startdate, end_str=enddate,
+            self.client.get_historical_klines(symbol=self.ticker, start_str=startDate, end_str=endDate,
                                               interval=self.interval))
         self.cleanDataFrame()
-        self.fileName = self.fileName + '-' + startdate + '-' + enddate + '.pkl'
-        self.frame.to_pickle(self.fileName)
-        print(self.fileName + "successfully created ! ")
 
-    def getCurrentData(self, lookback):
+    def getCurrentData(self, lookBackHours):
         self.frame = pd.DataFrame(
-            self.client.get_historical_klines(self.ticker, self.interval, lookback + ' hours ago UTC'))
+            self.client.get_historical_klines(self.ticker, self.interval, lookBackHours + ' hours ago UTC'))
         self.cleanDataFrame()
-        self.fileName = self.fileName + '-' + lookback + 'h' + '.pkl'
+
+    def createPickle(self, lookBackHours='1', startDate='noStartDate', endDate='noEndDate'):
+
+        if lookBackHours != '-1':
+            self.fileName = self.fileName + '-' + lookBackHours + 'h' + '.pkl'
+        elif startDate != 'noStartDate' and endDate != 'noEndDate':
+            self.fileName = self.fileName + '-' + startDate + '-' + endDate + '.pkl'
+
         self.frame.to_pickle(self.fileName)
         print(self.fileName + "successfully created ! ")
-
-    def printDf(self):
-        print(self.frame)
 
     def readData(self):
-        try:
-            return pd.read_pickle(self.fileName)
-        except:
-            print("No file created yet! ")
-            return
-
-# data = GetHistoricalData('BTCUSDT', '1h')
-# data.getDataBetweenDates('75')
+        return pd.read_pickle(self.fileName)
 
 
+
+data = GetHistoricalData('BTCUSDT', '1h', lookbackHours='75')
+df = data.getDataFrame()
+print(df)

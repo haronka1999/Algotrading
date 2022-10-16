@@ -28,7 +28,27 @@ from dataScraping.GetHistoricalData import GetHistoricalData
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import math
+
+from strategies.Strategy import Strategy
+
+
+class BollingerBand(Strategy):
+
+    df = pd.DataFrame()
+
+    def __init__(self,ticker,interval):
+        temp = GetHistoricalData(ticker,  interval)
+
+
+    def retrieveData(self):
+        pass
+
+    def createDF(self):
+        pass
+
+    def plot(self):
+        pass
+
 
 temp = GetHistoricalData('BTCUSDT', '1d')
 temp.getDataBetweenDates('2022-01-01', '2022-06-25')
