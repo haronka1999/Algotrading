@@ -40,7 +40,7 @@ class GetHistoricalData:
         self.interval = interval
         self.fileName = ticker + '-' + interval
         if startDate == 'noStartDate' and endDate == 'noEndDate' and lookbackHours == '-1':
-            print("No parameters were given.\nPlease give a lookback period or tow dates!")
+            print("No parameters were given.\nPlease give a lookback period or two dates!")
             sys.exit()
 
         if startDate != 'noStartDate' and endDate != 'noEndDate' and lookbackHours == '-1':
@@ -91,6 +91,7 @@ class GetHistoricalData:
 
 
 
-data = GetHistoricalData('BTCUSDT', '1h', lookbackHours='75')
-df = data.getDataFrame()
-print(df)
+# testing:
+# data = GetHistoricalData('BTCUSDT', '1h', lookbackHours='75')
+# df = data.getDataFrame()
+# print(df)

@@ -4,11 +4,7 @@ from abc import abstractmethod
 class Strategy:
 
     @abstractmethod
-    def retrieveData(self):
-        pass
-
-    @abstractmethod
-    def createDF(self):
+    def calculateStrategy(self):
         pass
 
     @abstractmethod

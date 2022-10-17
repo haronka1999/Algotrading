@@ -23,8 +23,9 @@ Ha elemezzuk akkor kiderul hogy ez nem teljesit jol bear marketben
 
 backtesting: buys and sells into df
 '''
+import sys
 
-from dataScraping.GetHistoricalData import GetHistoricalData
+from dataScraping.GetHistoricalData import GetHistoricalData, validate
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -34,20 +35,35 @@ from strategies.Strategy import Strategy
 
 class BollingerBand(Strategy):
 
+    ticker = ""
+    interval = ""
     df = pd.DataFrame()
 
-    def __init__(self,ticker,interval):
-        temp = GetHistoricalData(ticker,  interval)
+    def __init__(self, ticker, interval, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
+        self.ticker = ticker
+        self.interval = interval
 
+        if lookbackHours != -1:
+            data = GetHistoricalData(ticker,  interval,  lookbackHours=lookbackHours)
+        elif startDate != 'noStartDate' and endDate != 'noEndDate':
+            validate(startDate)
+            validate(endDate)
+            data = GetHistoricalData(ticker, interval,startDate=startDate, endDate=endDate)
+        else:
+            print("something wron with the parameters please try again")
+            sys.exit()
 
-    def retrieveData(self):
-        pass
+        self.df = data.getDataFrame()
 
-    def createDF(self):
-        pass
+    def calculateStrategy(self):
+        # TODO: add values to the basic dataframe
+        print("placeholder")
+
 
     def plot(self):
-        pass
+        # TODO write the plot function for this strategy
+        print("placeholder")
+
 
 
 temp = GetHistoricalData('BTCUSDT', '1d')
