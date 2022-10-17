@@ -4,7 +4,7 @@ from abc import abstractmethod
 class Strategy:
 
     @abstractmethod
-    def calculateStrategy(self):
+    def calculateValuesForDf(self, columns):
         pass
 
     @abstractmethod

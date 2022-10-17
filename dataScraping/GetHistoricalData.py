@@ -21,7 +21,7 @@ from secret.SecretKeys import api_key, api_secret
 DATE_FORMAT = 'yyyy-mm-dd'
 COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume',
                'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
-LOW_COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
+BOLLINGER_COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
 
 def validate(date_text):
