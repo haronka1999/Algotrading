@@ -10,13 +10,13 @@ It needs to implement two type of data fetching:
     2. and data from the current date to a lookback periodx
 
 '''
-from datetime import datetime
 
-import pandas as pd
+from datetime import datetime
+from secret.SecretKeys import api_key, api_secret
 from binance.client import Client
+import pandas as pd
 import sys
 
-from secret.SecretKeys import api_key, api_secret
 
 DATE_FORMAT = 'yyyy-mm-dd'
 COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume',

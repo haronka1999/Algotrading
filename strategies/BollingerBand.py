@@ -19,9 +19,17 @@ We handle this the following way:
     we open in the first buying signal and ignore the other
     we close in the first selling signal and ignore the other
 
-Note: this strategy does not work well on bear market
+Revision History:
+2022-10-15 - Class Created
+2022-10-21 - Class getting first Version
+
+Version Number: 1.0 V
+Notes:
+     - this strategy does not work well on bear market
+     - this strategy neeed improvement: risk management and handle unclosed positions!
 '''
-import pdb
+
+
 import sys
 
 from dataScraping.GetHistoricalData import GetHistoricalData, validate, BOLLINGER_COLUMN_LIST
@@ -30,6 +38,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from strategies.Strategy import Strategy
+
+
+# this price is equal with the percent of each trade
+def calculateProfit(merged):
+    return (merged.shift(-1)['Sell Price'] - merged['Buy Price'])/merged['Buy Price'] * 100
 
 
 class BollingerBand(Strategy):
@@ -81,12 +94,12 @@ class BollingerBand(Strategy):
             # buying pos
             if self.df.lower[i] > self.df.Close[i]:
                 if not open_pos:
-                    buys.append(self.df.Close[i])
+                    buys.append(i)
                     open_pos = True
             # selling pos
             elif self.df.upper[i] < self.df.Close[i]:
                 if open_pos:
-                    sells.append(self.df.Close[i])
+                    sells.append(i)
                     open_pos = False
 
         return buys,sells
@@ -99,19 +112,27 @@ class BollingerBand(Strategy):
         buys, sells = self.chooseSignals()
 
         # x axis the time of buy_signal y Axis is the price at the price time
-        # TODO: finish the video : https://www.youtube.com/watch?v=8PzQSgw0SpM
-        # understand how these upper and lower conditions works (ergo: chooseSignals() function)
-        # and  correct the plot as the video shows
-        plt.scatter(self.df.index[self.df.Buy_Signal], self.df[self.df.Buy_Signal].Close, marker='^', color='g')
-        plt.scatter(self.df.index[self.df.Sell_Signal], self.df[self.df.Sell_Signal].Close, marker='^', color='y')
+        plt.scatter(self.df.iloc[buys].index, self.df.iloc[buys].Close, marker='^', color='g')
+        plt.scatter(self.df.iloc[sells].index, self.df.iloc[sells].Close, marker='^', color='y')
         plt.fill_between(self.df.index, self.df.upper, self.df.lower, color='grey', alpha=0.3)
         plt.legend(['Close', 'SMA', 'upper', 'lower'])
         plt.show()
 
+    def backTest(self):
+        buys, sells = self.chooseSignals()
+        # concat: combine series into a df
+        # the close prices of the price and the sells close prices
+        merged = pd.concat([self.df.iloc[buys].Close, self.df.iloc[sells].Close], axis=1)
+        merged.columns = ['Buy Price', 'Sell Price']
+        profit = calculateProfit(merged)
+        print(profit)
 
 
-#test the class
-bollingerStrategy = BollingerBand('BTCUSDT', '30m', BOLLINGER_COLUMN_LIST, lookbackHours='96')
-bollingerStrategy.plot()
+
+
+
+    # test the class
+bollingerStrategy = BollingerBand('BTCUSDT', '30m', BOLLINGER_COLUMN_LIST, lookbackHours='130  ')
+bollingerStrategy.backTest()
 
 
