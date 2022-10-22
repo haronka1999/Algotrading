@@ -1,8 +1,9 @@
 """
 --------------------  Revision History: ----------------------------------------
 * 2022-10-22    -   Class Created, also implemented with stop loss
+* 2022-10-22    -   Small bug solved  for choosing selling signal
 --------------------------------------------------------------------------------
-Version Number: 1.0 V
+Version Number: 1.1 V
 
 Description
 Video: https://www.youtube.com/watch?v=AXc1YAsCduI&ab_channel=Algovibes
@@ -112,10 +113,12 @@ class MeanReversion(Strategy):
                 self._buydates.append(index)
                 self._buyprices.append(row.Close)
                 position = True
-            if (position and row['signal'] == 'Sell') or (len(self._buyprices) != 0 and row['shifted_Close'] < 0.98 * self._buyprices[-1]):
-                self._selldates.append(index)
-                self._sellprices.append(row.Close)
-                position = False
+
+            if position:
+                if (row['signal'] == 'Sell') or (len(self._buyprices) != 0 and row['shifted_Close'] < 0.98 * self._buyprices[-1]):
+                    self._selldates.append(index)
+                    self._sellprices.append(row.Close)
+                    position = False
 
 
 
