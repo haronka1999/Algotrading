@@ -3,7 +3,7 @@
 * 2022-10-22    -   Class Created, also implemented with stop loss
 * 2022-10-22    -   Small bug solved  for choosing selling signal
 --------------------------------------------------------------------------------
-Version Number: 1.1 V
+Version Number: 1.2 V
 
 Description
 Video: https://www.youtube.com/watch?v=AXc1YAsCduI&ab_channel=Algovibes
@@ -44,15 +44,17 @@ def getFormattedSeries(series):
 
 
 class MeanReversion(Strategy):
-    df = pd.DataFrame()
+
     COLUMN_LIST = ['Date', 'Close']
-    _buydates = []
-    _selldates = []
-    _buyprices = []
-    _sellprices = []
+
 
     def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
+        self.df = pd.DataFrame()
         super(MeanReversion, self).__init__(ticker, interval, lookbackHours, startDate, endDate)
+        self._buydates = []
+        self._selldates = []
+        self._buyprices = []
+        self._sellprices = []
         # clean the dataframe adn set values for column
         self._calculateValuesForDf(columns)
         # print(self.df.tail(50))
@@ -78,6 +80,11 @@ class MeanReversion(Strategy):
         cum_return = (relative_returns + 1).prod() - 1
         print("Cumulative returns: " + str(round(cum_return * 100, 2)) + " %")
 
+    def get_sellprices(self):
+        return self._sellprices
+
+    def get_buyprices(self):
+        return self._buyprices
 
     def _calculateValuesForDf(self, columns):
         column_len = len(columns)
@@ -119,11 +126,3 @@ class MeanReversion(Strategy):
                     self._selldates.append(index)
                     self._sellprices.append(row.Close)
                     position = False
-
-
-
-# test the class
-meanReversion = MeanReversion('BTCUSDT', '30m', MeanReversion.COLUMN_LIST, startDate='2022-08-01',
-                              endDate=Strategy.today)
-meanReversion.backTest()
-meanReversion.plot()

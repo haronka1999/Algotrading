@@ -4,7 +4,7 @@
 * 2022-10-21    -   Class getting first Version (1.0 V)
 * 2022-10-22    -   The constructor is initialized here and moved here from sub classes
 --------------------------------------------------------------------------------
-Version Number: 1.1 V
+Version Number: 1.2 V
 
 Description:
     Base class for every strategy which will be implemented
@@ -23,9 +23,6 @@ class Strategy:
     today = date.today().strftime("%Y-%m-%d")
 
     def __init__(self, ticker, interval, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
-        self.ticker = ticker
-        self.interval = interval
-
         if lookbackHours != '-1':
             data = GetHistoricalData(ticker, interval, lookbackHours=lookbackHours)
         elif startDate != 'noStartDate' and endDate != 'noEndDate':
