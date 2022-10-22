@@ -1,7 +1,11 @@
-# Read the docs below for understanding
 """
-A demonstration of pure Bollinger Band
+--------------------  Revision History: ----------------------------------------
+* 2022-10-15    -   Class Created
+* 2022-10-21    -  Class getting first Version (1.0 V)
+--------------------------------------------------------------------------------
+Version Number: 1.0 V
 
+Description
 Video: https://www.youtube.com/watch?v=8PzQSgw0SpM&t=915s
 
 Bollinger bands consist three bands:
@@ -10,7 +14,7 @@ Middle: SMA
 Down: SMA -2*STD
 
 This measure volatility but most importantly overbuying and overselling
-More than 1 interpretation,
+
 and it should be used with other tech indicators
 
 Buying strategy:
@@ -19,17 +23,14 @@ In this example we are selling when the upper trend is crossed, and we are buyin
 Problem is you can have more buy signal than sell signal ( vice versa )
 We handle this the following way:
 
-    we open in the first buying signal and ignore the other
-    we close in the first selling signal and ignore the other
+    - we open in the first buying signal and ignore the other
+    - we close in the first selling signal and ignore the other
 
-Revision History:
-2022-10-15 - Class Created
-2022-10-21 - Class getting first Version
-
-Version Number: 1.0 V
 Notes:
-     - this strategy does not work well on bear market
-     - this strategy need improvement: risk management and handle unclosed positions!
+    - this strategy does not work well on bear market
+    - this strategy need improvement: risk management and handle unclosed positions!
+    - this is only 1 interpration
+-----------------------------------------------------------------------------------
 """
 
 import sys
@@ -53,21 +54,7 @@ class BollingerBand(Strategy):
     df = pd.DataFrame()
 
     def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
-        self.ticker = ticker
-        self.interval = interval
-
-        if lookbackHours != -1:
-            data = GetHistoricalData(ticker, interval, lookbackHours=lookbackHours)
-        elif startDate != 'noStartDate' and endDate != 'noEndDate':
-            validate(startDate)
-            validate(endDate)
-            data = GetHistoricalData(ticker, interval, startDate=startDate, endDate=endDate)
-        else:
-            print("something wrong with the parameters please try again")
-            sys.exit()
-        self.df = data.getDataFrame()
-        # clean the dataframe adn set values for column
-        self.calculateValuesForDf(columns)
+        super(BollingerBand, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
 
     # calculate sma, std upper and lower band and signal and clear na:
     def calculateValuesForDf(self, columns):
