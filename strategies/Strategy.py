@@ -3,8 +3,9 @@
 * 2022-10-15    -   Class Created
 * 2022-10-21    -   Class getting first Version (1.0 V)
 * 2022-10-22    -   The constructor is initialized here and moved here from sub classes
+                and the selldates, buydates, sellprices buyprices attributes are moved from the sub classes
 --------------------------------------------------------------------------------
-Version Number: 1.2 V
+Version Number: 1.3 V
 
 Description:
     Base class for every strategy which will be implemented
@@ -31,6 +32,10 @@ class Strategy:
             print("something wrong with the parameters please try again")
             sys.exit()
         self.df = data.getDataFrame()
+        self.buydates = []
+        self.selldates = []
+        self.buyprices = []
+        self.sellprices = []
 
 
     @abstractmethod

@@ -2,8 +2,9 @@
 --------------------  Revision History: ----------------------------------------
 * 2022-10-22    -   Class Created, also implemented with stop loss
 * 2022-10-22    -   Small bug solved  for choosing selling signal
+* 2022-10-22    -   Optimized for Backtest.py class
 --------------------------------------------------------------------------------
-Version Number: 1.2 V
+Version Number: 1.3 V
 
 Description
 Video: https://www.youtube.com/watch?v=AXc1YAsCduI&ab_channel=Algovibes
@@ -31,18 +32,6 @@ from matplotlib import pyplot as plt
 from strategies.Strategy import Strategy
 
 
-def getFormattedSeries(series):
-    index_name = []
-    for i in range(len(series)):
-        # reformat index
-        index_name.append("Return for Trade " + str(i) + ": ")
-        # reformat value
-        series.iloc[i] = str(round(series.iloc[i] * 100, 2)) + " %"
-
-    series.index = index_name
-    return series
-
-
 class MeanReversion(Strategy):
 
     COLUMN_LIST = ['Date', 'Close']
@@ -51,40 +40,24 @@ class MeanReversion(Strategy):
     def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
         self.df = pd.DataFrame()
         super(MeanReversion, self).__init__(ticker, interval, lookbackHours, startDate, endDate)
-        self._buydates = []
-        self._selldates = []
-        self._buyprices = []
-        self._sellprices = []
         # clean the dataframe adn set values for column
         self._calculateValuesForDf(columns)
-        # print(self.df.tail(50))
-
-    # calculate sma, std upper and lower band and signal and clear na:
 
     def plot(self):
         plt.figure(figsize=(23, 6))
         # plt.plot(self.df[['Close', 'SMA_20', 'upper_band', 'lower_band']])
         plt.plot(self.df[['Close']])
-        plt.scatter(self.df.loc[self._buydates].index, self.df.loc[self._buydates].Close, marker='^', c='y')
-        plt.scatter(self.df.loc[self._selldates].index, self.df.loc[self._selldates].Close, marker='v', c='g')
+        plt.scatter(self.df.loc[self.buydates].index, self.df.loc[self.buydates].Close, marker='^', c='y')
+        plt.scatter(self.df.loc[self.selldates].index, self.df.loc[self.selldates].Close, marker='v', c='g')
         # plt.fill_between(self.df.index, self.df.upper_band, self.df.lower_band, color='grey', alpha=0.8)
         # plt.legend(['Close', 'SMA_20', 'upper_band', 'lower_band'])
         plt.show()
 
-    def backTest(self):
-        # calculate relative return for each trade
-        relative_returns = pd.Series(
-            [(self._sellprices - self._buyprices) / self._buyprices for self._sellprices, self._buyprices
-             in zip(self._sellprices, self._buyprices)])
-        print(getFormattedSeries(relative_returns.copy()))
-        cum_return = (relative_returns + 1).prod() - 1
-        print("Cumulative returns: " + str(round(cum_return * 100, 2)) + " %")
-
     def get_sellprices(self):
-        return self._sellprices
+        return self.sellprices
 
     def get_buyprices(self):
-        return self._buyprices
+        return self.buyprices
 
     def _calculateValuesForDf(self, columns):
         column_len = len(columns)
@@ -117,12 +90,12 @@ class MeanReversion(Strategy):
 
         for index, row in self.df.iterrows():
             if not position and row['signal'] == 'Buy':
-                self._buydates.append(index)
-                self._buyprices.append(row.Close)
+                self.buydates.append(index)
+                self.buyprices.append(row.Close)
                 position = True
 
             if position:
-                if (row['signal'] == 'Sell') or (len(self._buyprices) != 0 and row['shifted_Close'] < 0.98 * self._buyprices[-1]):
-                    self._selldates.append(index)
-                    self._sellprices.append(row.Close)
+                if (row['signal'] == 'Sell') or (len(self.buyprices) != 0 and row['shifted_Close'] < 0.98 * self.buyprices[-1]):
+                    self.selldates.append(index)
+                    self.sellprices.append(row.Close)
                     position = False

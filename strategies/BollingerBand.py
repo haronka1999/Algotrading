@@ -1,12 +1,15 @@
 """
 --------------------  Revision History: ----------------------------------------
 * 2022-10-15    -   Class Created
-* 2022-10-21    -  Class getting first Version (1.0 V)
+* 2022-10-21    -   Class getting first Version (1.0 V)
+# 2022-10-22    -   Optimized code for Backtest.py
 --------------------------------------------------------------------------------
-Version Number: 1.0 V
+
+Video: https://www.youtube.com/watch?v=8PzQSgw0SpM&t=915s
+
+Version Number: 1.1 V
 
 Description
-Video: https://www.youtube.com/watch?v=8PzQSgw0SpM&t=915s
 
 Bollinger bands consist three bands:
 Upper: SMA + 2*STD
@@ -68,54 +71,39 @@ class BollingerBand(Strategy):
 
         self.df['Buy_Signal'] = np.where(self.df.lower > self.df.Close, True, False)
         self.df['Sell_Signal'] = np.where(self.df.upper < self.df.Close, True, False)
-
+        self.chooseSignals()
         self.df = self.df.dropna()
 
     def chooseSignals(self):
-        buys = []
-        sells = []
         open_pos = False
-
         # getting only real trades loop through the df
         for i in range(len(self.df)):
             # buying pos
             if self.df.lower[i] > self.df.Close[i]:
                 if not open_pos:
-                    buys.append(i)
+                    self.buydates.append(self.df.index[i])
+                    self.buyprices.append(self.df.iloc[i].Close)
                     open_pos = True
             # selling pos
             elif self.df.upper[i] < self.df.Close[i]:
                 if open_pos:
-                    sells.append(i)
+                    self.selldates.append(self.df.index[i])
+                    self.sellprices.append(self.df.iloc[i].Close)
                     open_pos = False
-
-        return buys, sells
 
     def plot(self):
         plt.figure(figsize=(25, 6))
-        plt.plot(self.df[['Close', 'SMA', 'upper', 'lower']])
-
-        # make sure that we ignore multiple signals: we open in the first and close in the first ignore the others
-        buys, sells = self.chooseSignals()
-
+        # plt.plot(self.df[['Close', 'SMA', 'upper', 'lower']])
+        plt.plot(self.df[['Close']])
         # x-axis the time of buy_signal y Axis is the price at the price time
-        plt.scatter(self.df.iloc[buys].index, self.df.iloc[buys].Close, marker='^', color='g')
-        plt.scatter(self.df.iloc[sells].index, self.df.iloc[sells].Close, marker='^', color='y')
-        plt.fill_between(self.df.index, self.df.upper, self.df.lower, color='grey', alpha=0.3)
+        plt.scatter(self.buydates, self.buyprices, marker='^', color='g')
+        plt.scatter(self.selldates, self.sellprices, marker='^', color='y')
+        # plt.fill_between(self.df.index, self.df.upper, self.df.lower, color='grey', alpha=0.3)
         plt.legend(['Close', 'SMA', 'upper', 'lower'])
         plt.show()
 
-    def backTest(self):
-        buys, sells = self.chooseSignals()
-        # concat: combine series into a df
-        # the close prices of the price and the sells close prices
-        merged = pd.concat([self.df.iloc[buys].Close, self.df.iloc[sells].Close], axis=1)
-        merged.columns = ['Buy Price', 'Sell Price']
-        profit = calculateProfit(merged)
-        print(profit)
-
-    # test the class
 
 
-bollingerStrategy = BollingerBand('BTCUSDT', '30m', BollingerBand.COLUMN_LIST, lookbackHours='130  ')
-bollingerStrategy.backTest()
+# test the class
+#bollingerStrategy = BollingerBand('BTCUSDT', '30m', BollingerBand.COLUMN_LIST, lookbackHours='130  ')
+#bollingerStrategy.backTest()
