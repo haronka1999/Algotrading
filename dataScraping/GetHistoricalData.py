@@ -1,4 +1,12 @@
-'''
+"""
+--------------------  Revision History: ----------------------------------------
+* 2022-10-15    -   Class Created
+* 2022-10-21    -   Class getting first Version (1.0 V)
+--------------------------------------------------------------------------------
+Version Number: 1.0 V
+
+Description:
+
 The class is responsible for fetching crypto related data
 
 Constructor is setting:
@@ -7,9 +15,8 @@ Constructor is setting:
 
 It needs to implement two type of data fetching:
     1. between two dates
-    2. and data from the current date to a lookback periodx
-
-'''
+    2. and data from the current date to a lookback period
+"""
 
 from datetime import datetime
 from secret.SecretKeys import api_key, api_secret
@@ -18,17 +25,16 @@ import pandas as pd
 import sys
 
 
-DATE_FORMAT = 'yyyy-mm-dd'
+DATE_FORMAT = '%Y-%m-%d'
 COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume',
                'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
-BOLLINGER_COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
 
 def validate(date_text):
     try:
         datetime.strptime(date_text, DATE_FORMAT)
     except ValueError:
-        raise ValueError("Incorrect data format, should be YYYY-MM-DD")
+        raise ValueError("Incorrect data format, should be yyyy-mm-dd")
 
 
 class GetHistoricalData:

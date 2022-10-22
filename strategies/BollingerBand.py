@@ -29,17 +29,13 @@ We handle this the following way:
 Notes:
     - this strategy does not work well on bear market
     - this strategy need improvement: risk management and handle unclosed positions!
-    - this is only 1 interpration
+    - this is only 1 interpretation
 -----------------------------------------------------------------------------------
 """
 
-import sys
-
-from dataScraping.GetHistoricalData import GetHistoricalData, validate, BOLLINGER_COLUMN_LIST
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from strategies.Strategy import Strategy
 
 
@@ -52,16 +48,19 @@ class BollingerBand(Strategy):
     ticker = ""
     interval = ""
     df = pd.DataFrame()
+    COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
     def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
-        super(BollingerBand, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
+        super(BollingerBand, self).__init__(ticker, interval, lookbackHours, startDate, endDate)
+        # clean the dataframe adn set values for column
+        self._calculateValuesForDf(columns)
 
     # calculate sma, std upper and lower band and signal and clear na:
-    def calculateValuesForDf(self, columns):
+    def _calculateValuesForDf(self, columns):
         column_len = len(columns)
         self.df = self.df.iloc[:, :column_len]
-        self.df.columns = BOLLINGER_COLUMN_LIST
-        self.df = self.df.set_index(BOLLINGER_COLUMN_LIST[0])
+        self.df.columns = self.COLUMN_LIST
+        self.df = self.df.set_index(self.COLUMN_LIST[0])
         self.df['STD'] = self.df.Close.rolling(window=20).std()
         self.df['SMA'] = self.df.Close.rolling(window=20).mean()
         self.df['upper'] = self.df.SMA + 2 * self.df.STD
@@ -118,5 +117,5 @@ class BollingerBand(Strategy):
     # test the class
 
 
-bollingerStrategy = BollingerBand('BTCUSDT', '30m', BOLLINGER_COLUMN_LIST, lookbackHours='130  ')
+bollingerStrategy = BollingerBand('BTCUSDT', '30m', BollingerBand.COLUMN_LIST, lookbackHours='130  ')
 bollingerStrategy.backTest()
