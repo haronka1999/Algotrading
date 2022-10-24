@@ -16,7 +16,7 @@ Description:
 import sys
 from abc import abstractmethod
 from datetime import date
-from dataScraping.GetHistoricalData import GetHistoricalData
+from utils.dataScraping.GetHistoricalData import GetHistoricalData
 from utils import Utilities
 
 

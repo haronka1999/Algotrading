@@ -19,7 +19,7 @@ It needs to implement two type of data fetching:
 """
 
 from datetime import datetime
-from secret.SecretKeys import api_key, api_secret
+from utils.secret.SecretKeys import api_key, api_secret
 from binance.client import Client
 import pandas as pd
 import sys
