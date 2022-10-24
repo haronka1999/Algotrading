@@ -4,8 +4,10 @@
 * 2022-10-21    -   Class getting first Version (1.0 V)
 * 2022-10-22    -   The constructor is initialized here and moved here from sub classes
                 and the selldates, buydates, sellprices buyprices attributes are moved from the sub classes
+* 2022-10-24    -   Adding fearAndGreedIndex
+
 --------------------------------------------------------------------------------
-Version Number: 1.3 V
+Version Number: 1.4 V
 
 Description:
     Base class for every strategy which will be implemented
@@ -15,8 +17,7 @@ import sys
 from abc import abstractmethod
 from datetime import date
 from dataScraping.GetHistoricalData import GetHistoricalData
-
-
+from utils import Utilities
 
 
 class Strategy:
@@ -37,6 +38,12 @@ class Strategy:
         self.buyprices = []
         self.sellprices = []
 
+    def mergeFearAndGreedWithDf(self):
+        fearAndGreedIndex = Utilities.getFearAndGreedDf()
+        if fearAndGreedIndex.index.name != self.df.index.name:
+            print("Index names are not the same cannot join")
+            sys.exit()
+        return self.df.merge(fearAndGreedIndex, on=fearAndGreedIndex.index.name)
 
     @abstractmethod
     def _calculateValuesForDf(self, columns):

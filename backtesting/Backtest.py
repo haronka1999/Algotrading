@@ -35,8 +35,6 @@ def getFormattedSeries(series):
 
 
 class Backtest:
-    TEMP_COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
-
     # noinspection PyProtectedMember
     def __init__(self, strategy):
         self._sellprices = strategy.buyprices
@@ -52,18 +50,3 @@ class Backtest:
         cum_return = (self.relative_returns + 1).prod() - 1
         return str(round(cum_return * 100, 2)) + " %"
 
-
-#Testing Backtesting library
-meanReversion = MeanReversion('BTCUSDT', '30m', MeanReversion.COLUMN_LIST, startDate='2022-08-01',
-                               endDate=Strategy.today)
-backtest_meanReversion = Backtest(meanReversion)
-print(backtest_meanReversion.get_relative_returns())
-print(backtest_meanReversion.get_cumulative_returns())
-
-
-
-bollingerBands = BollingerBand('BTCUSDT', '30m', BollingerBand.COLUMN_LIST, startDate='2022-08-01',
-                               endDate=Strategy.today)
-backtest_bollingerBands = Backtest(bollingerBands)
-print(backtest_bollingerBands.get_relative_returns())
-print(backtest_bollingerBands.get_cumulative_returns())
