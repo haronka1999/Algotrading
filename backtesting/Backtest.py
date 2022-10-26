@@ -1,19 +1,15 @@
 """
 --------------------  Revision History: ----------------------------------------
-* 2022-10-22    -   Class Created and first version created
+* 2022-10-22    -   Class Created and first version created:
+                    implemented relative returns and cumulative returns
 --------------------------------------------------------------------------------
 Video: https://www.youtube.com/watch?v=yTupVd6D9m8&ab_channel=Algovibes
+Version Number: 1.0 V
 Description:
     A class where performance measures and backtesting libraries are implemented
 
     The input parameter should be a sub instnace of Strategy.py and
     selldates, buydates, sellprices buyprices  attributes should be filled
-
-
-Version Number: 1.0 V
---------------------------------------------------------------------------------
-    - implemented relative returns and cumulative returns
------------------------------------------------------------------------------------
 """
 import pandas as pd
 

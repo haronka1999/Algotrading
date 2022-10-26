@@ -1,7 +1,9 @@
+from strategies.MeanReversion import MeanReversion
+from strategies.Strategy import Strategy
 
-#Testing Backtesting library
+# Testing Backtesting library
 meanReversion = MeanReversion('BTCUSDT', '30m', MeanReversion.COLUMN_LIST, startDate='2022-08-01',
-                               endDate=Strategy.today)
+                              endDate=Strategy.today)
 print(meanReversion.mergeFearAndGreedWithDf())
 
 # backtest_meanReversion = Backtest(meanReversion)

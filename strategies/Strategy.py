@@ -8,31 +8,34 @@
 
 --------------------------------------------------------------------------------
 Version Number: 1.4 V
-
 Description:
+
     Base class for every strategy which will be implemented
 """
 
 import sys
 from abc import abstractmethod
-from datetime import date
+
+from utils.Utilities import today
 from utils.dataScraping.GetHistoricalData import GetHistoricalData
 from utils import Utilities
 
 
 class Strategy:
-    # format: yyyy-mm-dd
-    today = date.today().strftime("%Y-%m-%d")
-
-    def __init__(self, ticker, interval, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
+    def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate=today):
         if lookbackHours != '-1':
             data = GetHistoricalData(ticker, interval, lookbackHours=lookbackHours)
-        elif startDate != 'noStartDate' and endDate != 'noEndDate':
+        elif startDate != 'noStartDate':
             data = GetHistoricalData(ticker, interval, startDate=startDate, endDate=endDate)
         else:
             print("something wrong with the parameters please try again")
             sys.exit()
         self.df = data.getDataFrame()
+        # basic data cleaning
+        column_len = len(columns)
+        self.df = self.df.iloc[:, :column_len]
+        self.df.columns = columns
+        self.columns = columns
         self.buydates = []
         self.selldates = []
         self.buyprices = []

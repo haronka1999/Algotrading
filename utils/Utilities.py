@@ -1,5 +1,11 @@
+from datetime import date, datetime
 import requests
 import pandas as pd
+
+
+# format: yyyy-mm-dd
+DATE_FORMAT = '%Y-%m-%d'
+today = date.today().strftime("%Y-%m-%d")
 
 """
 Possible strategies:
@@ -8,7 +14,6 @@ Possible strategies:
     Notes:
      - This should be used with an existing strategy 
 """
-
 def getFearAndGreedDf():
     url = "https://api.alternative.me/fng/?limit=0"
     r = requests.get(url)
@@ -20,3 +25,10 @@ def getFearAndGreedDf():
     # revert to be the first date last
     df = df[::-1]
     return df
+
+
+def checkDateValidity(date_text):
+    try:
+        datetime.strptime(date_text, DATE_FORMAT)
+    except ValueError:
+        raise ValueError("Incorrect data format, should be yyyy-mm-dd")

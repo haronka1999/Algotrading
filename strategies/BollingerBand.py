@@ -4,11 +4,8 @@
 * 2022-10-21    -   Class getting first Version (1.0 V)
 # 2022-10-22    -   Optimized code for Backtest.py
 --------------------------------------------------------------------------------
-
 Video: https://www.youtube.com/watch?v=8PzQSgw0SpM&t=915s
-
 Version Number: 1.1 V
-
 Description
 
 Bollinger bands consist three bands:
@@ -54,15 +51,12 @@ class BollingerBand(Strategy):
     COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
     def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
-        super(BollingerBand, self).__init__(ticker, interval, lookbackHours, startDate, endDate)
+        super(BollingerBand, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
         # clean the dataframe adn set values for column
         self._calculateValuesForDf(columns)
 
     # calculate sma, std upper and lower band and signal and clear na:
     def _calculateValuesForDf(self, columns):
-        column_len = len(columns)
-        self.df = self.df.iloc[:, :column_len]
-        self.df.columns = self.COLUMN_LIST
         self.df = self.df.set_index(self.COLUMN_LIST[0])
         self.df['STD'] = self.df.Close.rolling(window=20).std()
         self.df['SMA'] = self.df.Close.rolling(window=20).mean()
