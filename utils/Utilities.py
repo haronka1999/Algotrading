@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import requests
 import pandas as pd
 
@@ -6,7 +6,7 @@ import pandas as pd
 # format: yyyy-mm-dd
 DATE_FORMAT = '%Y-%m-%d'
 today = date.today().strftime("%Y-%m-%d")
-
+yesterday = date.today() - timedelta(days = 1)
 """
 Possible strategies:
     - Hold an asset until the fear and greed index is above 50
