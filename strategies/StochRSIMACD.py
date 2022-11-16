@@ -29,8 +29,6 @@ import pandas as pd
 import ta
 from ta import momentum, trend
 
-from utils.Utilities import today
-
 # TODO: Finish video and correct mistakes
 class StochRSIMACD(Strategy):
     df = pd.DataFrame()
@@ -113,5 +111,3 @@ class StochRSIMACD(Strategy):
     def plot(self):
         pass
 
-
-strat = StochRSIMACD('BTCUSDT', '30m', StochRSIMACD.COLUMN_LIST, startDate='2021-01-01', endDate='2021-03-01')

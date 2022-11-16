@@ -1,3 +1,15 @@
+"""
+--------------------  Revision History: ----------------------------------------
+# 2022-11-15    -   Class created: rss_feed_urls, item_attr_map added
+* 2022-11-16    -   Added COLUMN_LIST
+--------------------------------------------------------------------------------
+Description:
+    A classed used for storing general constants
+---------------------------------------------------------------------------
+"""
+
+COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
+
 rss_feed_urls = ["https://www.coindesk.com/arc/outboundfeeds/rss/", "https://cointelegraph.com/rss",
                  "https://news.bitcoin.com/feed/",
                  "https://cryptopotato.com/feed/", "https://zycrypto.com/category/news/feed/",

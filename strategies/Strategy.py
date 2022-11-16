@@ -15,16 +15,16 @@ Description:
 
 import sys
 from abc import abstractmethod
-from utils.dataScraping.GetHistoricalData import GetHistoricalData
+from utils.GetHistoricalData import GetHistoricalData
 from utils import Utilities
 
 
 class Strategy:
     def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
         if lookbackHours != '-1':
-            data = GetHistoricalData(ticker, interval, lookbackHours=lookbackHours)
+            data = GetHistoricalData(ticker, interval, lookbackHours, startDate, endDate)
         elif startDate != 'noStartDate':
-            data = GetHistoricalData(ticker, interval, startDate=startDate, endDate=endDate)
+            data = GetHistoricalData(ticker, interval, lookbackHours, startDate, endDate)
         else:
             print("something wrong with the parameters please try again")
             sys.exit()

@@ -4,6 +4,7 @@
 * 2022-10-22    -   Small bug solved  for choosing selling signal
 * 2022-10-22    -   Optimized for Backtest.py class
 * 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
+                    - correcting COLUMN LIST
 --------------------------------------------------------------------------------
 Video: https://www.youtube.com/watch?v=AXc1YAsCduI&ab_channel=Algovibes
 Article: https://www.linkedin.com/pulse/algorithmic-trading-mean-reversion-using-python-bryan-chen/
@@ -32,7 +33,7 @@ from strategies.Strategy import Strategy
 
 class MeanReversion(Strategy):
 
-    COLUMN_LIST = ['Date', 'Close']
+    COLUMN_LIST = ['Time', 'Close']
 
 
     def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):

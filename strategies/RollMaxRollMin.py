@@ -10,11 +10,9 @@ TODO: add description, search video and understand logic
 ---------------------------------------------------------------------------
 """
 
-from utils.Utilities import today
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from strategies.Strategy import Strategy
 
 
@@ -71,6 +69,3 @@ class RollMaxRollMin(Strategy):
 
         return buydates, selldates
 
-
-strat = RollMaxRollMin('BTCUSDT', '1h', RollMaxRollMin.COLUMN_LIST, '400')
-strat.plot()

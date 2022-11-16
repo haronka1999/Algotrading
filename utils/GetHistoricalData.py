@@ -3,9 +3,8 @@
 * 2022-10-15    -   Class Created
 * 2022-10-21    -   Class getting first Version (1.0 V)
 * 2022-10-24    -   Optimizing speed: storing dataframes in csv file
+* 2022-11-16    -   Corrected the constructor's parameter list
 --------------------------------------------------------------------------------
-Version Number: 1.1 V
-
 Description:
 
 The class is responsible for fetching crypto related data
@@ -19,21 +18,30 @@ It needs to implement two type of data fetching:
     2. and data from the current date to a lookback period
 """
 import os.path
-from utils.Utilities import today, checkDateValidity
+from datetime import datetime
 from utils.secret.SecretKeys import api_key, api_secret
 from binance.client import Client
 import pandas as pd
 import sys
 
+FULL_COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume',
+                    'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
+PATH_TO_DATAFILES = os.path.join('utils', 'dataFiles')
+DATE_FORMAT = '%Y-%m-%d'
 
-COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume',
-               'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
-PATH_TO_DATAFILES = os.path.join('..', 'utils', 'dataFiles')
+
+def checkDateValidity(date_text):
+    try:
+        datetime.strptime(date_text, DATE_FORMAT)
+    except ValueError:
+        raise ValueError("Incorrect data format, should be yyyy-mm-dd")
+
+
 class GetHistoricalData:
     frame = pd.DataFrame()
     client = Client(api_key, api_secret)
 
-    def __init__(self, ticker, interval, lookbackHours='-1', startDate='noStartDate', endDate=today):
+    def __init__(self, ticker, interval, lookbackHours, startDate, endDate):
         self.ticker = ticker
         self.interval = interval
         self.lookbackHours = lookbackHours
@@ -48,7 +56,6 @@ class GetHistoricalData:
             self._populateDataFrameFromBinance()
         else:
             self.frame = self._loadCSVFileToDataFrame()
-
 
     def _populateDataFrameFromBinance(self):
         if self.startDate != 'noStartDate' and self.lookbackHours == '-1':
@@ -75,14 +82,13 @@ class GetHistoricalData:
         elif self.startDate != 'noStartDate':
             return self.ticker + '-' + self.interval + '-' + self.startDate + '_' + self.endDate + '.csv'
 
-
     def getDataFrame(self):
         return self.frame
 
     def _cleanDataFrame(self):
-        self.frame.columns = COLUMN_LIST
+        self.frame.columns = FULL_COLUMN_LIST
         print(type(self.frame.Time))
-        self.frame.Time = pd.to_datetime(self.frame.Time/1000, unit='s')
+        self.frame.Time = pd.to_datetime(self.frame.Time / 1000, unit='s')
         self.frame.Open = self.frame.Open.astype(float)
         self.frame.High = self.frame.High.astype(float)
         self.frame.Low = self.frame.Low.astype(float)
@@ -94,7 +100,6 @@ class GetHistoricalData:
                                               interval=self.interval))
 
         self._cleanDataFrame()
-
 
     def getCurrentData(self, lookBackHours):
         self.frame = pd.DataFrame(
@@ -110,9 +115,7 @@ class GetHistoricalData:
             sys.exit()
 
     def _loadCSVFileToDataFrame(self):
-        return pd.read_csv(os.path.join(PATH_TO_DATAFILES,self.fileName))
-
-
+        return pd.read_csv(os.path.join(PATH_TO_DATAFILES, self.fileName))
 
 # testing:
 # data = GetHistoricalData('BTCUSDT', '1h', lookbackHours='75')

@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 import ta.trend
 from strategies.Strategy import Strategy
-from utils.Utilities import today
 
 
 class WilliamFractal(Strategy):

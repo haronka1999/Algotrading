@@ -1,6 +1,7 @@
 """
 --------------------  Revision History: ----------------------------------------
 * 2022-10-15    -   Class Created
+* 2022-10-16    -   Strategies connected to UI, the ability to display date in the SCREEN
 --------------------------------------------------------------------------------
 Version Number: 1.0 V
 Description:
@@ -10,19 +11,39 @@ Description:
 
 import streamlit as st
 import datetime
+from utils import constants
+from utils.Utilities import getStrategyClassNames, createStrategyInstanceFromString
 from utils.inputValidation import validateInputs
 
+# GLOBAL VARIABLES
 ticker_symbol = ""
 interval = ""
-lookBackHours = ""
-startDate = ""
-endDate = ""
+lookBackHours = "-1"
+startDate = "noStartDate"
+endDate = "noEndDate"
+classNames = getStrategyClassNames()
+currentStrategy = st.selectbox('Choose a predefined strategy', classNames)
 
-option = st.selectbox(
-    'Choose a predefined strategy',
-    ('Choose', 'Bollinger Bands', 'Mean Reversion', 'Roll Max Roll Min'))
 
-if option != 'Choose':
+def submitForm():
+    if st.button('Submit'):
+        error = validateInputs(ticker_symbol, interval, lookBackHours, startDate, endDate)
+        if error != "":
+            st.write(error)
+        else:
+            st.write("The given inputs are correct please see the charts below: ")
+            st.write("We got the following input:")
+
+            p_strategy = createStrategyInstanceFromString(currentStrategy, ticker_symbol, interval,
+                                                          constants.COLUMN_LIST, lookBackHours, startDate, endDate)
+            if p_strategy is None:
+                st.write("Something wrong with the strategy option")
+            else:
+                return p_strategy
+
+
+st.write("The current strategies are working: BollingerBand")
+if currentStrategy != 'Choose':
     # retrieve inputs:
     ticker_symbol = st.text_input('Ticker symbol:', placeholder='ex. BTCUSD, ETHUSDT, ADAUSDT, etc')
     interval = st.text_input('Chandle chart interval:', placeholder='ex. 15m, 30m, 1h, 4h, 6h, 24h')
@@ -30,7 +51,8 @@ if option != 'Choose':
     retrieveMethod = st.radio('Choose data retrieval method: lookback hours or date range: ', ('lookback', 'dateRange'))
     if retrieveMethod == 'lookback':
         lookBackHours = st.slider('Look back period in hours: ', 1, 300, 24)
-        st.write('You have choosed:', str(lookBackHours // 24 ) + ' days and ' + str(lookBackHours % 24 ) + " hours" )
+        st.write('You have choosed:', str(lookBackHours // 24) + ' days and ' + str(lookBackHours % 24) + " hours")
+        lookBackHours = str(lookBackHours)
     elif retrieveMethod == 'dateRange':
         st.markdown("<h3 style='text-align: center'>or</h3>", unsafe_allow_html=True)
         appointment = st.slider("Select Range", min_value=datetime.date(2020, 12, 18), max_value=datetime.date.today(),
@@ -38,9 +60,6 @@ if option != 'Choose':
         startDate = str(appointment[0])
         endDate = str(appointment[1])
 
-    if st.button('Submit'):
-        error = validateInputs(ticker_symbol, interval, lookBackHours, startDate, endDate)
-        if error != "":
-            st.write(error)
-        else:
-            st.write("The given inputs are correct please see the charts below: ")
+    strategy = submitForm()
+    st.write(strategy.df)
+

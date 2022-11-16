@@ -13,11 +13,6 @@ Description:
 """
 import pandas as pd
 
-from strategies.BollingerBand import BollingerBand
-from strategies.MeanReversion import MeanReversion
-from strategies.Strategy import Strategy
-
-
 def getFormattedSeries(series):
     index_name = []
     for i in range(len(series)):
