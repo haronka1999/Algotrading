@@ -19,6 +19,8 @@ It needs to implement two type of data fetching:
 """
 import os.path
 from datetime import datetime
+
+from utils.constants import noStartDate, noEndDate, noLookBackHours
 from utils.secret.SecretKeys import api_key, api_secret
 from binance.client import Client
 import pandas as pd
@@ -26,7 +28,7 @@ import sys
 
 FULL_COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume',
                     'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
-PATH_TO_DATAFILES = os.path.join('utils', 'dataFiles')
+PATH_TO_DATAFILES = os.path.join('..','utils', 'dataFiles')
 DATE_FORMAT = '%Y-%m-%d'
 
 
@@ -58,11 +60,11 @@ class GetHistoricalData:
             self.frame = self._loadCSVFileToDataFrame()
 
     def _populateDataFrameFromBinance(self):
-        if self.startDate != 'noStartDate' and self.lookbackHours == '-1':
+        if self.startDate != noStartDate and self.endDate != noEndDate and self.lookbackHours == noLookBackHours:
             checkDateValidity(self.startDate)
             checkDateValidity(self.endDate)
             self.getDataBetweenDates(self.startDate, self.endDate)
-        elif self.lookbackHours != '-1':
+        elif self.lookbackHours != noLookBackHours and self.startDate == noStartDate and self.endDate == noEndDate:
             self.getCurrentData(self.lookbackHours)
         else:
             print("something wrong with the parameters, please try again")
@@ -72,14 +74,14 @@ class GetHistoricalData:
         self._createCSVFileFromDataFrame()
 
     def _checkParameters(self):
-        if self.startDate == 'noStartDate' and self.lookbackHours == '-1':
+        if self.startDate == noStartDate and self.endDate == noEndDate and self.lookbackHours == noLookBackHours:
             print("No parameters were given.\nPlease give a lookback period or two dates!")
             sys.exit()
 
     def getCSVFileName(self):
-        if self.lookbackHours != '-1':
+        if self.lookbackHours != noLookBackHours:
             return self.ticker + '-' + self.interval + '-' + self.lookbackHours + 'h' + '.csv'
-        elif self.startDate != 'noStartDate':
+        elif self.startDate != noStartDate and self.endDate == noEndDate:
             return self.ticker + '-' + self.interval + '-' + self.startDate + '_' + self.endDate + '.csv'
 
     def getDataFrame(self):

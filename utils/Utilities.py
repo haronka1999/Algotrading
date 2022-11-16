@@ -14,7 +14,6 @@ import re
 from datetime import date, datetime, timedelta
 import requests
 import pandas as pd
-from strategies import BollingerBand, MeanReversion, RegressionModels, RollMaxRollMin, StochRSIMACD, WilliamFractal
 
 # format: yyyy-mm-dd
 
@@ -45,28 +44,6 @@ def getFearAndGreedDf():
 
 
 
-# create an instance for every strategy based on the chosen string
-def createStrategyInstanceFromString(p_strategy, ticker_symbol, interval, column_list, lookBackHours, startDate, endDate):
-    if p_strategy == "BollingerBand":
-        return BollingerBand.BollingerBand(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                           endDate)
-    elif p_strategy == "MeanReversion":
-        return MeanReversion.MeanReversion(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                           endDate)
-    elif p_strategy == "RegressionModels":
-        return RegressionModels.RegressionModels(ticker_symbol, interval, column_list, lookBackHours,
-                                                 startDate, endDate)
-    elif p_strategy == "RollMaxRollMin":
-        return RollMaxRollMin.RollMaxRollMin(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                             endDate)
-    elif p_strategy == "StochRSIMACD":
-        return StochRSIMACD.StochRSIMACD(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                         endDate)
-    elif p_strategy == "WilliamFractal":
-        return WilliamFractal.WilliamFractal(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                             endDate)
-    else:
-        return None
 
 
 # this is used for generating class names so the User can see in the UI

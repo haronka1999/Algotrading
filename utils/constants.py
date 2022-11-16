@@ -10,6 +10,10 @@ Description:
 
 COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
+noLookBackHours = "-1"
+noStartDate = "noStartDate"
+noEndDate = "noEndDate"
+
 rss_feed_urls = ["https://www.coindesk.com/arc/outboundfeeds/rss/", "https://cointelegraph.com/rss",
                  "https://news.bitcoin.com/feed/",
                  "https://cryptopotato.com/feed/", "https://zycrypto.com/category/news/feed/",
