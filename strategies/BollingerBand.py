@@ -94,5 +94,5 @@ class BollingerBand(Strategy):
         plt.scatter(self.selldates, self.sellprices, marker='^', color='y')
         # plt.fill_between(self.df.index, self.df.upper, self.df.lower, color='grey', alpha=0.3)
         plt.legend(['Close', 'SMA', 'upper', 'lower'])
-        plt.show()
+        return plt
 

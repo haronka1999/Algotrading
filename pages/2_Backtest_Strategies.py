@@ -3,7 +3,6 @@
 * 2022-10-15    -   Class Created
 * 2022-10-16    -   Strategies connected to UI, the ability to display date in the SCREEN
 --------------------------------------------------------------------------------
-Version Number: 1.0 V
 Description:
 
     The use should be able to choose an existing strategy and backtest it in multiple timeframes
@@ -25,7 +24,7 @@ classNames = getStrategyClassNames()
 currentStrategy = st.selectbox('Choose a predefined strategy', classNames)
 
 
-def submitForm():
+def submitFormAndGetStrategy():
     if st.button('Submit'):
         error = validateInputs(ticker_symbol, interval, lookBackHours, startDate, endDate)
         if error != "":
@@ -60,6 +59,8 @@ if currentStrategy != 'Choose':
         startDate = str(appointment[0])
         endDate = str(appointment[1])
 
-    strategy = submitForm()
-    st.write(strategy.df)
-
+    strategy = submitFormAndGetStrategy()
+    if strategy is not None:
+        st.dataframe(strategy.df)
+        fig = strategy.plot()
+        st.pyplot(fig)
