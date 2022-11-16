@@ -3,10 +3,10 @@
 * 2022-10-22    -   Class Created, also implemented with stop loss
 * 2022-10-22    -   Small bug solved  for choosing selling signal
 * 2022-10-22    -   Optimized for Backtest.py class
+* 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
 --------------------------------------------------------------------------------
 Video: https://www.youtube.com/watch?v=AXc1YAsCduI&ab_channel=Algovibes
 Article: https://www.linkedin.com/pulse/algorithmic-trading-mean-reversion-using-python-bryan-chen/
-Version Number: 1.3 V
 Description
 
 Strategy: if a stock is going up than we can sell and if it goes down it, we can buy
@@ -27,7 +27,6 @@ import numpy as np
 import pandas as pd
 from ta import momentum
 from matplotlib import pyplot as plt
-
 from strategies.Strategy import Strategy
 
 
@@ -36,7 +35,7 @@ class MeanReversion(Strategy):
     COLUMN_LIST = ['Date', 'Close']
 
 
-    def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
+    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
         self.df = pd.DataFrame()
         super(MeanReversion, self).__init__(ticker, interval,columns, lookbackHours, startDate, endDate)
         # clean the dataframe adn set values for column

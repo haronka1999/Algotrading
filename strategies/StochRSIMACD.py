@@ -1,9 +1,9 @@
 """
 --------------------  Revision History: ----------------------------------------
-# 2022-11-11    -   Class created basic functionalitites implemented
+# 2022-11-11    -   Class created basic functionalities implemented
+* 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
 --------------------------------------------------------------------------------
 Video: https://www.youtube.com/watch?v=r8pU-8l1KPU
-Version Number: 1.0 V
 Description:
 Indicators used:
     - %d = stochastic slow
@@ -36,7 +36,7 @@ class StochRSIMACD(Strategy):
     df = pd.DataFrame()
     COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
-    def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate=today):
+    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
         super(StochRSIMACD, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
         # clean the dataframe and set values for column
         self._calculateValuesForDf(columns)

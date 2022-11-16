@@ -3,9 +3,9 @@
 * 2022-10-15    -   Class Created
 * 2022-10-21    -   Class getting first Version (1.0 V)
 # 2022-10-22    -   Optimized code for Backtest.py
+* 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
 --------------------------------------------------------------------------------
 Video: https://www.youtube.com/watch?v=8PzQSgw0SpM&t=915s
-Version Number: 1.1 V
 Description
 
 Bollinger bands consist three bands:
@@ -50,7 +50,7 @@ class BollingerBand(Strategy):
     df = pd.DataFrame()
     COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
-    def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate='noEndDate'):
+    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
         super(BollingerBand, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
         # clean the dataframe adn set values for column
         self._calculateValuesForDf(columns)
@@ -96,8 +96,3 @@ class BollingerBand(Strategy):
         plt.legend(['Close', 'SMA', 'upper', 'lower'])
         plt.show()
 
-
-
-# test the class
-#bollingerStrategy = BollingerBand('BTCUSDT', '30m', BollingerBand.COLUMN_LIST, lookbackHours='130  ')
-#bollingerStrategy.backTest()

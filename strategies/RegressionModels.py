@@ -1,28 +1,22 @@
 """
 --------------------  Revision History: ----------------------------------------
 # 2022-11-11    -   Class created
+* 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
 --------------------------------------------------------------------------------
 Video: https://www.youtube.com/watch?v=AXBhrLongC8&t=430s
-Version Number: 1.0 V
 Description
 
 Taking past data to predict future return if the return is positive we hold,
 otherwise the asset should be shorted
 ---------------------------------------------------------------------------
 """
-
-from venv import create
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, Ridge, RidgeCV, Lasso
-import numpy as np
-import time
-import datetime  as dt
+from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 
 from strategies.Strategy import Strategy
-from utils.Utilities import today
 
 
 def _plot(X, y, y_pred, model):
@@ -42,7 +36,7 @@ class RegressionModels(Strategy):
     df = pd.DataFrame()
     COLUMN_LIST = ['Time', 'Open']
 
-    def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate=today):
+    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
         super(RegressionModels, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
         # clean the dataframe and set values for column
         self._calculateValuesForDf(columns)
@@ -66,11 +60,8 @@ class RegressionModels(Strategy):
     # TODO: check datei
     def _calculateValuesForDf(self, columns):
         pass
-        #(self.df.Time.to_datetime())
-        #self.df.Time.to_timestamp()
+        # (self.df.Time.to_datetime())
+        # self.df.Time.to_timestamp()
 
     def plot(self):
         pass
-
-regressionModel = RegressionModels('BTCUSDT', '15m', RegressionModels.COLUMN_LIST, startDate='2022-04-01')
-regressionModel.plotLinearRegression()

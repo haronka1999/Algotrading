@@ -1,9 +1,9 @@
 """
 --------------------  Revision History: ----------------------------------------
 # 2022-10-24    -   Class created and stuck with no buying signals
+* 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
 --------------------------------------------------------------------------------
 Video: https://www.youtube.com/watch?v=4MnNft7Squk
-Version Number: 1.0 V
 Description
 
 Check if the previous four data candle and the following 4 candle
@@ -22,7 +22,7 @@ class WilliamFractal(Strategy):
     COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
     CANDLE_LOOKBACK = 4
 
-    def __init__(self, ticker, interval, columns, lookbackHours='-1', startDate='noStartDate', endDate=today):
+    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
         super(WilliamFractal, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
         # clean the dataframe and set values for column
         self._calculateValuesForDf(columns)
@@ -59,7 +59,3 @@ class WilliamFractal(Strategy):
 
         self.df['wf_top'] = temp_series_top
         self.df['wf_top'] = self.df['wf_top'].replace(0, np.NaN)
-
-
-# test it
-williamFractal = WilliamFractal('BTCUSDT', '15m', WilliamFractal.COLUMN_LIST, startDate='2020-10-08')
