@@ -6,7 +6,8 @@
                 and the selldates, buydates, sellprices buyprices attributes are moved from the sub classes
 * 2022-10-24    -   Adding fearAndGreedIndex
 * 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
-
+* 2022-11-24    -   Code reformatting: moved checking into GetHistoricalData and  implement the two separate
+                    data retrieval method
 --------------------------------------------------------------------------------
 Description:
 
@@ -15,25 +16,20 @@ Description:
 
 import sys
 from abc import abstractmethod
-from utils.GetHistoricalData import GetHistoricalData
+from utils.GetHistoricalData import GetHistoricalData, RetrieveDataFromYFinance
 from utils import Utilities
 
 
 class Strategy:
-    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
-        if lookbackHours != '-1':
-            data = GetHistoricalData(ticker, interval, lookbackHours, startDate, endDate)
-        elif startDate != 'noStartDate':
+    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate, isBinance=False):
+
+        if isBinance:
             data = GetHistoricalData(ticker, interval, lookbackHours, startDate, endDate)
         else:
-            print("something wrong with the parameters please try again")
-            sys.exit()
+            data = RetrieveDataFromYFinance()
+
         self.df = data.getDataFrame()
-        # basic data cleaning
-        column_len = len(columns)
-        self.df = self.df.iloc[:, :column_len]
-        self.df.columns = columns
-        self.columns = columns
+
         self.buydates = []
         self.selldates = []
         self.buyprices = []

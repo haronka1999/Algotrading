@@ -1,7 +1,8 @@
 """
 --------------------  Revision History: ----------------------------------------
-* 2022-10-15    -   Class Created
+* 2022-10-15    -   File Created
 * 2022-10-16    -   Strategies connected to UI, the ability to display date in the SCREEN
+* 2022-11-24    -   helper functions moved to ui_utils
 --------------------------------------------------------------------------------
 Description:
 
@@ -10,11 +11,11 @@ Description:
 
 import streamlit as st
 import datetime
-from utils import constants
+from pages.utils_ui.utils import createStrategyInstanceFromString
+from utils.constants import COLUMN_LIST
 from utils.Utilities import getStrategyClassNames
 from utils.constants import noStartDate, noEndDate, noLookBackHours
 from utils.inputValidation import validateInputs
-from strategies import BollingerBand, MeanReversion, RegressionModels, RollMaxRollMin, StochRSIMACD, WilliamFractal
 
 # GLOBAL VARIABLES
 ticker_symbol = ""
@@ -26,29 +27,7 @@ classNames = getStrategyClassNames()
 currentStrategy = st.selectbox('Choose a predefined strategy', classNames)
 
 
-
 # create an instance for every strategy based on the chosen string
-def createStrategyInstanceFromString(p_strategy, ticker_symbol, interval, column_list, lookBackHours, startDate, endDate):
-    if p_strategy == "BollingerBand":
-        return BollingerBand.BollingerBand(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                           endDate)
-    elif p_strategy == "MeanReversion":
-        return MeanReversion.MeanReversion(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                           endDate)
-    elif p_strategy == "RegressionModels":
-        return RegressionModels.RegressionModels(ticker_symbol, interval, column_list, lookBackHours,
-                                                 startDate, endDate)
-    elif p_strategy == "RollMaxRollMin":
-        return RollMaxRollMin.RollMaxRollMin(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                             endDate)
-    elif p_strategy == "StochRSIMACD":
-        return StochRSIMACD.StochRSIMACD(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                         endDate)
-    elif p_strategy == "WilliamFractal":
-        return WilliamFractal.WilliamFractal(ticker_symbol, interval, column_list, lookBackHours, startDate,
-                                             endDate)
-    else:
-        return None
 
 def submitFormAndGetStrategy():
     if st.button('Submit'):
@@ -60,7 +39,7 @@ def submitFormAndGetStrategy():
             st.write("We got the following input:")
 
             p_strategy = createStrategyInstanceFromString(currentStrategy, ticker_symbol, interval,
-                                                          constants.COLUMN_LIST, lookBackHours, startDate, endDate)
+                                                          COLUMN_LIST, lookBackHours, startDate, endDate)
             if p_strategy is None:
                 st.write("Something wrong with the strategy option")
             else:
