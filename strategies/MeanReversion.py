@@ -29,16 +29,13 @@ import pandas as pd
 from ta import momentum
 from matplotlib import pyplot as plt
 from strategies.Strategy import Strategy
+from utils.constants import COLUMN_LIST
 
 
 class MeanReversion(Strategy):
-
-    COLUMN_LIST = ['Time', 'Close']
-
-
-    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
+    def __init__(self, ticker, interval, columns, lookback_time, startDate, endDate, api_key="", api_secret=""):
         self.df = pd.DataFrame()
-        super(MeanReversion, self).__init__(ticker, interval,columns, lookbackHours, startDate, endDate)
+        super(MeanReversion, self).__init__(ticker, interval, columns, lookback_time, startDate, endDate, api_key, api_secret)
         # clean the dataframe adn set values for column
         self._calculateValuesForDf(columns)
 
@@ -59,7 +56,7 @@ class MeanReversion(Strategy):
         return self.buyprices
 
     def _calculateValuesForDf(self, columns):
-        self.df = self.df.set_index(self.COLUMN_LIST[0])
+        self.df = self.df.set_index(COLUMN_LIST[0])
         self.df['SMA_20'] = self.df.Close.rolling(20).mean()
         #  rolling standard deviation (vol = volatility )
         self.df['vol'] = self.df.Close.rolling(20).std()

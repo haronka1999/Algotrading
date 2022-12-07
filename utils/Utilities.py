@@ -6,28 +6,28 @@
 --------------------------------------------------------------------------------
 Description:
 
-    The use should be able to choose an existing strategy and backtest it in multiple timeframes
+    General utility class for usage in the whole project
 """
 
 import os
 import re
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 import requests
 import pandas as pd
 
 # format: yyyy-mm-dd
-
 today = date.today().strftime("%Y-%m-%d")
 yesterday = date.today() - timedelta(days=1)
 
-
 """
-Possible strategies:
+Possible strategies with fear and greed:
     - Hold an asset until the fear and greed index is above 50
     
     Notes:
      - This should be used with an existing strategy 
 """
+
+
 def getFearAndGreedDf():
     url = "https://api.alternative.me/fng/?limit=0"
     r = requests.get(url)
@@ -41,15 +41,10 @@ def getFearAndGreedDf():
     return df
 
 
-
-
-
-
-
 # this is used for generating class names so the User can see in the UI
 def getStrategyClassNames():
     classNames = []
-    directory = "strategies"
+    directory = 'C:\\AlgoTrading\\strategies'
     for filename in os.listdir(directory):
         if filename.endswith(".py"):
             with open(os.path.join(directory, filename)) as topo_file:
@@ -60,5 +55,3 @@ def getStrategyClassNames():
         classNames.remove("")
 
     return classNames
-
-

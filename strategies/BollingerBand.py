@@ -50,8 +50,8 @@ class BollingerBand(Strategy):
     df = pd.DataFrame()
     COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
-    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
-        super(BollingerBand, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
+    def __init__(self, ticker, interval, columns, lookback_time, startDate, endDate, api_key="", api_secret=""):
+        super(BollingerBand, self).__init__(ticker, interval, columns, lookback_time, startDate, endDate, api_key, api_secret)
         # clean the dataframe adn set values for column
         self._calculateValuesForDf(columns)
 

@@ -16,17 +16,19 @@ Description:
 
 import sys
 from abc import abstractmethod
-from utils.GetHistoricalData import GetHistoricalData, RetrieveDataFromYFinance
+from utils.get_historical_data import GetHistoricalData
 from utils import Utilities
 
 
 class Strategy:
-    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate, isBinance=False):
+    def __init__(self, ticker, interval, columns, lookback_time, startDate, endDate, api_key="", api_secret=""):
 
-        if isBinance:
-            data = GetHistoricalData(ticker, interval, lookbackHours, startDate, endDate)
+        if api_key == "" and api_secret == "":
+            data = GetHistoricalData(ticker, interval, lookback_time, startDate, endDate, api_key="", api_secret="")
+
         else:
-            data = RetrieveDataFromYFinance()
+            data = GetHistoricalData(ticker, interval, lookback_time, startDate, endDate, api_key=api_key, api_secret=api_secret)
+
 
         self.df = data.getDataFrame()
 

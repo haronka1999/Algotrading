@@ -10,9 +10,14 @@ Description:
 
 COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
+FULL_COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume',
+                    'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
+
 noLookBackHours = "-1"
 noStartDate = "noStartDate"
 noEndDate = "noEndDate"
+lookback_time_for_bots = "5m"
+default_strategy_str = "Choose"
 
 rss_feed_urls = ["https://www.coindesk.com/arc/outboundfeeds/rss/", "https://cointelegraph.com/rss",
                  "https://news.bitcoin.com/feed/",

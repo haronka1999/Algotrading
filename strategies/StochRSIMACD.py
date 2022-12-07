@@ -4,7 +4,7 @@
 * 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
                     - class corrected  and got it's first form (not compatible with UI and Backtest yet
 --------------------------------------------------------------------------------
-Video: https://www.youtube.com/watch?v=r8pU-8l1KPU and https://www.youtube.com/watch?v=X50-c54BWV8&t=53s
+Video: https://www.youtube.com/watch?v=r8pU-8l1KPU
 Description:
 Indicators used:
     - %d = stochastic slow
@@ -34,22 +34,27 @@ from ta import momentum, trend
 from utils import constants
 
 
+# backtest should have:
+#   - sell and buy signals
+#
+# strategy should have
+#   - a logi behind it
 class StochRSIMACD(Strategy):
-    df = pd.DataFrame()
-    COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
-
-    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
-        super(StochRSIMACD, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
+    def __init__(self, ticker, interval, columns, lookback_time, startDate, endDate, api_key="", api_secret=""):
+        super(StochRSIMACD, self).__init__(ticker, interval, columns, lookback_time, startDate, endDate, api_key,
+                                           api_secret)
         # clean the dataframe and set values for column
         self.actual_trades = None
         self._calculateValuesForDf(columns)
 
-        # print(self.df)
-
     def _calculateValuesForDf(self, columns):
-        self.df = self.df.set_index(self.COLUMN_LIST[0])
         self._applyTechnicals()
         self.decide()
+
+    def getBuyDatesForTradingBot(self):
+        #print("actual trades: ")
+        #print(self.actual_trades)
+        return self.df.loc[self.actual_trades["Buying_dates"]]
 
     def getTrigger(self, lags, buy=True):
         dfx = pd.DataFrame()
@@ -58,13 +63,14 @@ class StochRSIMACD(Strategy):
                 mask = (self.df['%K'].shift(i) < 20) & (self.df['%D'].shift(i) < 20)
             else:
                 mask = (self.df['%K'].shift(i) > 80) & (self.df['%D'].shift(i) > 80)
-            dfx = dfx.append(mask, ignore_index=True)
+            dfx = pd.concat([dfx, pd.DataFrame([mask])], ignore_index=True)
+            # dfx = dfx.append(mask, ignore_index=True)
         return dfx.sum(axis=0)
 
     # check if the trigger is fulfilled and buying condition fulfilled
     def decide(self):
-        self.df['Buytrigger'] = np.where(self.getTrigger(4), 1, 0)
-        self.df['Selltrigger'] = np.where(self.getTrigger(4, False), 1, 0)
+        self.df['Buytrigger'] = np.where(self.getTrigger(20), 1, 0)
+        self.df['Selltrigger'] = np.where(self.getTrigger(20, False), 1, 0)
 
         self.df['Buy'] = np.where(
             (self.df['Buytrigger']) & (self.df['%K'].between(20, 80)) & (self.df['%D'].between(20, 80)) & (
@@ -74,38 +80,38 @@ class StochRSIMACD(Strategy):
             (self.df['Selltrigger']) & (self.df['%K'].between(20, 80)) & (self.df['%D'].between(20, 80)) & (
                     self.df.rsi < 50) & (self.df.macd < 0), 1, 0)
 
-        Buying_dates, Selling_dates = [], []
+        # Buying_dates, Selling_dates = [], []
         for i in range(len(self.df) - 1):
             # if my buying column contains a signal
             if self.df.Buy.iloc[i]:
-                Buying_dates.append(self.df.iloc[i + 1].name)
+                self.buydates.append(self.df.iloc[i + 1].name)
+                #newDf = pd.DataFrame([self.df.iloc[i + 1].name])
+                #self.buydates = pd.concat([self.buydates, newDf])
                 # when I have appended a date I'm checking when my selling date is fulfilled
                 # num =  number of iteration
                 # j = the value of the Sell column in the numth iteration
                 for num, j in enumerate(self.df.Sell[i:]):
                     if j:
-                        Selling_dates.append(self.df.iloc[i + num + 1].name)
+                        self.selldates.append(self.df.iloc[i + num + 1].name)
+                        #newDf = pd.DataFrame([self.df.iloc[i + num + 1].name])
+                        #self.selldates = pd.concat([self.selldates, newDf])
                         break
 
         # if I have one extra buying date
-        cut = len(Buying_dates) - len(Selling_dates)
+        cut = len(self.buydates) - len(self.selldates)
         if cut:
-            Buying_dates = Buying_dates[:-cut]
-        frame = pd.DataFrame({'Buying_dates': Buying_dates, 'Selling_dates': Selling_dates})
+            self.buydates = self.buydates[:-cut]
+        frame = pd.DataFrame({'Buying_dates': self.buydates, 'Selling_dates': self.selldates})
 
         # avoid parallel trades we have to cut overlapping trades
         self.actual_trades = frame[frame.Buying_dates > frame.Selling_dates.shift(1)]
-        print(self.actual_trades)
-        BuyPrices = self.df.loc[self.actual_trades.Buying_dates].Open
-        SellPrices = self.df.loc[self.actual_trades.Selling_dates].Open
-        print(str((SellPrices.values - BuyPrices.values) / BuyPrices.values))
 
     def _applyTechnicals(self):
         self.df['%K'] = ta.momentum.stoch(self.df.High, self.df.Low, self.df.Close, window=14, smooth_window=3)
         self.df['%D'] = self.df['%K'].rolling(3).mean()
         self.df['rsi'] = ta.momentum.rsi(self.df.Close, window=14)
         self.df['macd'] = ta.trend.macd_diff(self.df.Close)
-        self.df.dropna(inplace=True)
+        # self.df.dropna(inplace=True)
 
     def plot(self):
         plt.figure(figsize=(20, 10))
@@ -117,5 +123,8 @@ class StochRSIMACD(Strategy):
         plt.show()
 
 
-hej = StochRSIMACD('BTCUSDT', '5m', constants.COLUMN_LIST, '240', 'noStartDate', 'noEndDate')
-hej.plot()
+# hej = StochRSIMACD('BTCUSDT', '5m', constants.COLUMN_LIST, '240', 'noStartDate', 'noEndDate')
+# hej.plot()
+
+hej = StochRSIMACD('BTCUSDT', '1m', constants.COLUMN_LIST, '10 min', 'noStartDate', 'noEndDate', api_key="public",
+                   api_secret="private")

@@ -11,11 +11,10 @@ Description:
 
 import streamlit as st
 import datetime
-from pages.utils_ui.utils import createStrategyInstanceFromString
+from pages.utils_ui.utils import createStrategyInstanceFromString, validateInputs
 from utils.constants import COLUMN_LIST
 from utils.Utilities import getStrategyClassNames
 from utils.constants import noStartDate, noEndDate, noLookBackHours
-from utils.inputValidation import validateInputs
 
 # GLOBAL VARIABLES
 ticker_symbol = ""
@@ -51,8 +50,8 @@ if currentStrategy != 'Choose':
     # retrieve inputs:
     ticker_symbol = st.text_input('Ticker symbol:', placeholder='ex. BTCUSD, ETHUSDT, ADAUSDT, etc')
     interval = st.text_input('Chandle chart interval:', placeholder='ex. 15m, 30m, 1h, 4h, 6h, 24h')
-
     retrieveMethod = st.radio('Choose data retrieval method: lookback hours or date range: ', ('lookback', 'dateRange'))
+
     if retrieveMethod == 'lookback':
         lookBackHours = st.slider('Look back period in hours: ', 1, 300, 24)
         st.write('You have choosed:', str(lookBackHours // 24) + ' days and ' + str(lookBackHours % 24) + " hours")
