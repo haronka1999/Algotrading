@@ -2,7 +2,7 @@
 --------------------  Revision History: ----------------------------------------
 * 2022-10-22    -   Class Created, also implemented with stop loss
 * 2022-10-22    -   Small bug solved  for choosing selling signal
-* 2022-10-22    -   Optimized for Backtest.py class
+* 2022-10-22    -   Optimized for backtest.py class
 * 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
                     - correcting COLUMN LIST
 --------------------------------------------------------------------------------
@@ -28,14 +28,14 @@ import numpy as np
 import pandas as pd
 from ta import momentum
 from matplotlib import pyplot as plt
-from strategies.Strategy import Strategy
+from strategies.strategy import Strategy
 
 class MeanReversion(Strategy):
-    def __init__(self, ticker, interval, lookback_time, startDate, endDate, api_key="", api_secret=""):
+    def __init__(self, ticker, interval, lookback_time, start_date, end_date, api_key="", api_secret=""):
         self.df = pd.DataFrame()
-        super(MeanReversion, self).__init__(ticker, interval, lookback_time, startDate, endDate, api_key, api_secret)
+        super(MeanReversion, self).__init__(ticker, interval, lookback_time, start_date, end_date, api_key, api_secret)
         # clean the dataframe adn set values for column
-        self._calculateValuesForDf()
+        self.calculate_values_for_df()
 
     def plot(self):
         plt.figure(figsize=(23, 6))
@@ -53,7 +53,7 @@ class MeanReversion(Strategy):
     def get_buyprices(self):
         return self.buyprices
 
-    def _calculateValuesForDf(self):
+    def calculate_values_for_df(self):
         self.df['SMA_20'] = self.df.Close.rolling(20).mean()
         #  rolling standard deviation (vol = volatility )
         self.df['vol'] = self.df.Close.rolling(20).std()
@@ -69,11 +69,11 @@ class MeanReversion(Strategy):
 
         # this is for the stop loss (we get the one row before)
         self.df['shifted_Close'] = self.df.Close.shift()
-        self._getSignals()
+        self.get_signals()
 
     # loop over the rows screen for buys set a position flag (we do not buy again)
     # sell if we are in a position
-    def _getSignals(self):
+    def get_signals(self):
         # default shift is 1
         self.df.signal = self.df.signal.shift()
         position = False

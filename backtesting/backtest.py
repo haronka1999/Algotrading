@@ -8,12 +8,12 @@ Version Number: 1.0 V
 Description:
     A class where performance measures and backtesting libraries are implemented
 
-    The input parameter should be a sub instnace of Strategy.py and
+    The input parameter should be a sub instnace of strategy.py and
     selldates, buydates, sellprices buyprices  attributes should be filled
 """
 import pandas as pd
 
-def getFormattedSeries(series):
+def get_formatted_series(series):
     index_name = []
     for i in range(len(series)):
         # reformat index
@@ -35,7 +35,7 @@ class Backtest:
              in zip(self._sellprices, self._buyprices)])
 
     def get_relative_returns(self):
-        return getFormattedSeries(self.relative_returns.copy())
+        return get_formatted_series(self.relative_returns.copy())
 
     def get_cumulative_returns(self):
         cum_return = (self.relative_returns + 1).prod() - 1

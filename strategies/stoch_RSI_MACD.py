@@ -25,7 +25,7 @@ Selling Condition:
 """
 from matplotlib import pyplot as plt
 
-from strategies.Strategy import Strategy
+from strategies.strategy import Strategy
 import numpy as np
 import pandas as pd
 import ta
@@ -37,11 +37,11 @@ from ta import momentum, trend
 # strategy should have
 #   - a logi behind it
 class StochRSIMACD(Strategy):
-    def __init__(self, ticker, interval, lookback_time, startDate, endDate, api_key="", api_secret=""):
-        super(StochRSIMACD, self).__init__(ticker, interval, lookback_time, startDate, endDate, api_key,
+    def __init__(self, ticker, interval, lookback_time, start_date, end_date, api_key="", api_secret=""):
+        super(StochRSIMACD, self).__init__(ticker, interval, lookback_time, start_date, end_date, api_key,
                                            api_secret)
         # clean the dataframe and set values for column
-        self._calculateValuesForDf()
+        self.calculate_values_for_df()
         self.actual_trades = None
         # self.actual_trades = pd.DataFrame({
         #     'Buy Dates': self.buydates,
@@ -50,11 +50,11 @@ class StochRSIMACD(Strategy):
         #     'Sell Price': self.df.Open[self.selldates]
         # })
 
-    def _calculateValuesForDf(self):
+    def calculate_values_for_df(self):
         self._applyTechnicals()
         self.decide()
 
-    def getTrigger(self, lags, buy=True):
+    def get_trigger(self, lags, buy=True):
         dfx = pd.DataFrame()
         for i in range(lags + 1):
             if buy:
@@ -67,8 +67,8 @@ class StochRSIMACD(Strategy):
 
     # check if the trigger is fulfilled and buying condition fulfilled
     def decide(self):
-        self.df['Buytrigger'] = np.where(self.getTrigger(20), 1, 0)
-        self.df['Selltrigger'] = np.where(self.getTrigger(20, False), 1, 0)
+        self.df['Buytrigger'] = np.where(self.get_trigger(20), 1, 0)
+        self.df['Selltrigger'] = np.where(self.get_trigger(20, False), 1, 0)
 
         self.df['Buy'] = np.where(
             (self.df['Buytrigger']) & (self.df['%K'].between(20, 80)) & (self.df['%D'].between(20, 80)) & (
@@ -83,16 +83,12 @@ class StochRSIMACD(Strategy):
             # if my buying column contains a signal
             if self.df.Buy.iloc[i]:
                 self.buydates.append(self.df.iloc[i + 1].name)
-                # newDf = pd.DataFrame([self.df.iloc[i + 1].name])
-                # self.buydates = pd.concat([self.buydates, newDf])
                 # when I have appended a date I'm checking when my selling date is fulfilled
                 # num =  number of iteration
                 # j = the value of the Sell column in the numth iteration
                 for num, j in enumerate(self.df.Sell[i:]):
                     if j:
                         self.selldates.append(self.df.iloc[i + num + 1].name)
-                        # newDf = pd.DataFrame([self.df.iloc[i + num + 1].name])
-                        # self.selldates = pd.concat([self.selldates, newDf])
                         break
 
         # if I have one extra buying date
@@ -127,10 +123,3 @@ class StochRSIMACD(Strategy):
         #             color='r', s=500)
         return plt
         # plt.show()
-
-
-# hej = StochRSIMACD('BTCUSDT', '5m', constants.COLUMN_LIST, '240', 'noStartDate', 'noEndDate')
-# hej.plot()
-
-hej = StochRSIMACD('BTCUSDT', '1m', '10 min', 'noStartDate', 'noEndDate', api_key="public",
-                   api_secret="private")

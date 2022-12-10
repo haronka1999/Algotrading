@@ -28,7 +28,7 @@ Possible strategies with fear and greed:
 """
 
 
-def getFearAndGreedDf():
+def get_fear_and_greed_DF():
     url = "https://api.alternative.me/fng/?limit=0"
     r = requests.get(url)
     df = pd.DataFrame(r.json()['data'])
@@ -42,7 +42,7 @@ def getFearAndGreedDf():
 
 
 # this is used for generating class names so the User can see in the UI
-def getStrategyClassNames():
+def get_strategy_class_names():
     classNames = []
     directory = 'C:\\AlgoTrading\\strategies'
     for filename in os.listdir(directory):

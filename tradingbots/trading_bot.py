@@ -15,13 +15,13 @@ Target Profit the x% of the buying price  (100.5%)
 import time
 from binance import Client
 from binance.exceptions import BinanceAPIException
-from pages.utils_ui.utils import createStrategyInstanceFromString
-from strategies.StochRSIMACD import StochRSIMACD
+from pages.utils_ui.utils import create_strategy_instance_from_string
+from strategies.stoch_RSI_MACD import StochRSIMACD
 from utils import constants
-from utils.Utilities import getStrategyClassNames
+from utils.utilities import get_strategy_class_names
 import streamlit as st
 
-classNames = getStrategyClassNames()
+class_names = get_strategy_class_names()
 
 # TODO:  display messages correctly on the display tab
 class TradingBot:
@@ -35,9 +35,9 @@ class TradingBot:
         self.chosen_strategy = chosen_strategy
         self.client = Client(public_key, private_key)
         self.account = self.client.get_account()
-        self.strategy = createStrategyInstanceFromString(chosen_strategy, pair, interval, constants.COLUMN_LIST,
-                                                         lookback_time, 'noStartDate', 'noEndDate', api_key=public_key,
-                                                         api_secret=private_key)
+        self.strategy = create_strategy_instance_from_string(chosen_strategy, pair, interval,
+                                                             lookback_time, 'noStartDate', 'noEndDate', api_key=public_key,
+                                                             api_secret=private_key)
 
         # variables validation
         self.error_message = self.validate_inputs()
@@ -47,10 +47,10 @@ class TradingBot:
 
         # initialize trading bot
         while True:
-            self.applyStrategy(pair, 0.0001)
+            self.apply_strategy(pair, 0.0001)
             time.sleep(0.5)
 
-    def applyStrategy(self, pair, qty, open_position=False):
+    def apply_strategy(self, pair, qty, open_position=False):
         buy_price = 0
         self.refreshData()
         my_string = f'current close is: ' + str(self.strategy.df.Close.iloc[-1])
@@ -83,7 +83,7 @@ class TradingBot:
                     return
 
     def refreshData(self):
-        self.strategy = StochRSIMACD(self.pair, '1m', constants.COLUMN_LIST, '10 min', 'noStartDate', 'noEndDate',
+        self.strategy = StochRSIMACD(self.pair, '1m', '10 min', 'noStartDate', 'noEndDate',
                                      api_key="public", api_secret="private")
 
     def check_quantity(self):
@@ -94,7 +94,7 @@ class TradingBot:
         return ""
 
     def check_strategy_exists(self):
-        if self.chosen_strategy not in classNames:
+        if self.chosen_strategy not in class_names:
             return "Something wrong with the strategy Name"
         return ""
 

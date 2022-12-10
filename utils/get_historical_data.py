@@ -22,7 +22,7 @@ It needs to implement two type of data fetching:
 import os.path
 from datetime import datetime
 
-from utils.constants import noStartDate, noEndDate, noLookBackHours,COLUMN_LIST
+from utils.constants import no_start_date, no_end_date, no_lookback_time,COLUMN_LIST
 from binance.client import Client
 import pandas as pd
 import sys
@@ -31,7 +31,7 @@ PATH_TO_DATAFILES = os.path.join('..', 'utils', 'dataFiles')
 DATE_FORMAT = '%Y-%m-%d'
 
 
-def checkDateValidity(date_text):
+def check_date_validity(date_text):
     try:
         datetime.strptime(date_text, DATE_FORMAT)
     except ValueError:
@@ -39,30 +39,30 @@ def checkDateValidity(date_text):
 
 class GetHistoricalData:
 
-    def __init__(self, ticker, interval, lookBackTime, startDate, endDate, api_key="", api_secret=""):
+    def __init__(self, ticker, interval, lookback_time, start_date, end_date, api_key="", api_secret=""):
         self.frame = pd.DataFrame()
         self.client = Client(api_key, api_secret)
         self.ticker = ticker
         self.interval = interval
-        self.lookBackTime = lookBackTime
-        self.startDate = startDate
-        self.endDate = endDate
-        self._checkParameters()
-        self._populateDataFrameFromBinance()
+        self.lookback_time = lookback_time
+        self.start_date = start_date
+        self.end_date = end_date
+        self.check_parameters()
+        self.populate_dataframe_from_binance()
 
-    def _populateDataFrameFromBinance(self):
-        if self.startDate != noStartDate and self.endDate != noEndDate and self.lookBackTime == noLookBackHours:
-            checkDateValidity(self.startDate)
-            checkDateValidity(self.endDate)
-            self.getDataBetweenDates(self.startDate, self.endDate)
-        elif self.lookBackTime != noLookBackHours and self.startDate == noStartDate and self.endDate == noEndDate:
-            self.getCurrentData(self.lookBackTime)
+    def populate_dataframe_from_binance(self):
+        if self.start_date != no_start_date and self.end_date != no_end_date and self.lookback_time == no_lookback_time:
+            check_date_validity(self.start_date)
+            check_date_validity(self.end_date)
+            self.getDataBetweenDates(self.start_date, self.end_date)
+        elif self.lookback_time != no_lookback_time and self.start_date == no_start_date and self.end_date == no_end_date:
+            self.retrieve_current_data(self.lookback_time)
         else:
             print("something wrong with the parameters, please try again")
             sys.exit()
 
-    def _checkParameters(self):
-        if self.startDate == noStartDate and self.endDate == noEndDate and self.lookBackTime == noLookBackHours:
+    def check_parameters(self):
+        if self.start_date == no_start_date and self.end_date == no_end_date and self.lookback_time == no_lookback_time:
             print("No parameters were given.\nPlease give a lookback period or two dates!")
             sys.exit()
 
@@ -73,14 +73,14 @@ class GetHistoricalData:
         self.frame = pd.DataFrame(
             self.client.get_historical_klines(symbol=self.ticker, start_str=startDate, end_str=endDate,
                                               interval=self.interval))
-        self._cleanDataFrame()
+        self.clean_dataframe()
 
-    def getCurrentData(self, lookBackTime):
+    def retrieve_current_data(self, lookBackTime):
         self.frame = pd.DataFrame(
             self.client.get_historical_klines(self.ticker, self.interval, lookBackTime + ' ago UTC'))
-        self._cleanDataFrame()
+        self.clean_dataframe()
 
-    def _cleanDataFrame(self):
+    def clean_dataframe(self):
         self.frame = self.frame.iloc[:, :6]
         self.frame.columns = COLUMN_LIST
         self.frame.Time = self.frame.Time.astype(float)

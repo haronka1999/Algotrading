@@ -2,7 +2,7 @@
 --------------------  Revision History: ----------------------------------------
 * 2022-10-15    -   Class Created
 * 2022-10-21    -   Class getting first Version (1.0 V)
-# 2022-10-22    -   Optimized code for Backtest.py
+# 2022-10-22    -   Optimized code for backtest.py
 * 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
 --------------------------------------------------------------------------------
 Video: https://www.youtube.com/watch?v=8PzQSgw0SpM&t=915s
@@ -36,7 +36,7 @@ Notes:
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from strategies.Strategy import Strategy
+from strategies.strategy import Strategy
 
 
 # this price is equal with the percent of each trade
@@ -49,22 +49,10 @@ class BollingerBand(Strategy):
     interval = ""
     df = pd.DataFrame()
 
-    def __init__(self, ticker, interval, lookback_time, startDate, endDate, api_key="", api_secret=""):
-        super(BollingerBand, self).__init__(ticker, interval, lookback_time, startDate, endDate, api_key, api_secret)
+    def __init__(self, ticker, interval, lookback_time, start_date, end_date, api_key="", api_secret=""):
+        super(BollingerBand, self).__init__(ticker, interval, lookback_time, start_date, end_date, api_key, api_secret)
         # clean the dataframe adn set values for column
-        self._calculateValuesForDf()
-
-    # calculate sma, std upper and lower band and signal and clear na:
-    def _calculateValuesForDf(self):
-        self.df['STD'] = self.df.Close.rolling(window=20).std()
-        self.df['SMA'] = self.df.Close.rolling(window=20).mean()
-        self.df['upper'] = self.df.SMA + 2 * self.df.STD
-        self.df['lower'] = self.df.SMA - 2 * self.df.STD
-
-        self.df['Buy_Signal'] = np.where(self.df.lower > self.df.Close, True, False)
-        self.df['Sell_Signal'] = np.where(self.df.upper < self.df.Close, True, False)
-        self.chooseSignals()
-        self.df = self.df.dropna()
+        self.calculate_values_for_df()
         self.actual_trades = pd.DataFrame({
             'Buy Dates': self.buydates,
             'Buy Price': self.buyprices,
@@ -72,7 +60,20 @@ class BollingerBand(Strategy):
             'Sell Price': self.sellprices
         })
 
-    def chooseSignals(self):
+    # calculate sma, std upper and lower band and signal and clear na:
+    def calculate_values_for_df(self):
+        self.df['STD'] = self.df.Close.rolling(window=20).std()
+        self.df['SMA'] = self.df.Close.rolling(window=20).mean()
+        self.df['upper'] = self.df.SMA + 2 * self.df.STD
+        self.df['lower'] = self.df.SMA - 2 * self.df.STD
+
+        self.df['Buy_Signal'] = np.where(self.df.lower > self.df.Close, True, False)
+        self.df['Sell_Signal'] = np.where(self.df.upper < self.df.Close, True, False)
+        self.choose_signals()
+        self.df = self.df.dropna()
+
+
+    def choose_signals(self):
         open_pos = False
         # getting only real trades loop through the df
         for i in range(len(self.df)):
