@@ -37,7 +37,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from strategies.Strategy import Strategy
-import streamlit as st
+
 
 # this price is equal with the percent of each trade
 def calculateProfit(merged):
@@ -65,6 +65,12 @@ class BollingerBand(Strategy):
         self.df['Sell_Signal'] = np.where(self.df.upper < self.df.Close, True, False)
         self.chooseSignals()
         self.df = self.df.dropna()
+        self.actual_trades = pd.DataFrame({
+            'Buy Dates': self.buydates,
+            'Buy Price': self.buyprices,
+            'Sell Date': self.selldates,
+            'Sell Price': self.sellprices
+        })
 
     def chooseSignals(self):
         open_pos = False
@@ -88,9 +94,8 @@ class BollingerBand(Strategy):
         # plt.plot(self.df[['Close', 'SMA', 'upper', 'lower']])
         plt.plot(self.df[['Close']])
         # x-axis the time of buy_signal y Axis is the price at the price time
-        plt.scatter(self.buydates, self.buyprices, marker='^', color='g')
-        plt.scatter(self.selldates, self.sellprices, marker='^', color='y')
+        plt.scatter(self.buydates, self.buyprices, marker='^', color='g', s=70)
+        plt.scatter(self.selldates, self.sellprices, marker='^', color='y', s=70)
         # plt.fill_between(self.df.index, self.df.upper, self.df.lower, color='grey', alpha=0.3)
         plt.legend(['Close', 'SMA', 'upper', 'lower'])
         return plt
-

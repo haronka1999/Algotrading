@@ -41,17 +41,18 @@ class StochRSIMACD(Strategy):
         super(StochRSIMACD, self).__init__(ticker, interval, lookback_time, startDate, endDate, api_key,
                                            api_secret)
         # clean the dataframe and set values for column
-        self.actual_trades = None
         self._calculateValuesForDf()
+        self.actual_trades = None
+        # self.actual_trades = pd.DataFrame({
+        #     'Buy Dates': self.buydates,
+        #     'Buy Price': self.df.Open[self.buydates],
+        #     'Sell Date': self.selldates,
+        #     'Sell Price': self.df.Open[self.selldates]
+        # })
 
     def _calculateValuesForDf(self):
         self._applyTechnicals()
         self.decide()
-
-    def getBuyDatesForTradingBot(self):
-        # print("actual trades: ")
-        # print(self.actual_trades)
-        return self.df.loc[self.actual_trades["Buying_dates"]]
 
     def getTrigger(self, lags, buy=True):
         dfx = pd.DataFrame()
@@ -113,11 +114,19 @@ class StochRSIMACD(Strategy):
     def plot(self):
         plt.figure(figsize=(20, 10))
         plt.plot(self.df.Close, color='k', alpha=0.7)
-        plt.scatter(self.actual_trades.Buying_dates, self.df.Open[self.actual_trades.Buying_dates], marker='^',
+
+        plt.scatter(self.buydates, self.df.Open[self.buydates], marker='^',
                     color='g', s=500)
-        plt.scatter(self.actual_trades.Selling_dates, self.df.Open[self.actual_trades.Selling_dates], marker='v',
+        plt.scatter(self.selldates, self.df.Open[self.selldates], marker='v',
                     color='r', s=500)
-        plt.show()
+
+
+        # plt.scatter(self.actual_trades.Buying_dates, self.df.Open[self.actual_trades.Buying_dates], marker='^',
+        #             color='g', s=500)
+        # plt.scatter(self.actual_trades.Selling_dates, self.df.Open[self.actual_trades.Selling_dates], marker='v',
+        #             color='r', s=500)
+        return plt
+        # plt.show()
 
 
 # hej = StochRSIMACD('BTCUSDT', '5m', constants.COLUMN_LIST, '240', 'noStartDate', 'noEndDate')

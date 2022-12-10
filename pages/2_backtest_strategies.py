@@ -33,6 +33,7 @@ def submitFormAndGetStrategy():
         error = validateInputs(ticker_symbol, interval, lookBackHours, startDate, endDate)
         if error != "":
             st.write(error)
+            return None
         else:
             st.write("The given inputs are correct please see the charts below: ")
             st.write("We got the following input:")
@@ -46,6 +47,7 @@ def submitFormAndGetStrategy():
             p_strategy = createStrategyInstanceFromString(currentStrategy, ticker_symbol, interval, lookBackHours, startDate, endDate)
             if p_strategy is None:
                 st.write("Something wrong with the strategy option")
+                return None
             else:
                 return p_strategy
 
@@ -68,8 +70,13 @@ if currentStrategy != 'Choose':
         startDate = str(appointment[0])
         endDate = str(appointment[1])
 
+    # TODO correct the plotting and actual trades needs to be debugged
     strategy = submitFormAndGetStrategy()
     if strategy is not None:
+        st.pyplot(strategy.plot())
+        st.markdown("Trades")
+        st.dataframe(strategy.actual_trades)
+        st.markdown("DataFrame")
         st.dataframe(strategy.df)
-        fig = strategy.plot()
-        st.pyplot(fig)
+
+
