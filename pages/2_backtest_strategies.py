@@ -37,8 +37,13 @@ def submitFormAndGetStrategy():
             st.write("The given inputs are correct please see the charts below: ")
             st.write("We got the following input:")
 
-            p_strategy = createStrategyInstanceFromString(currentStrategy, ticker_symbol, interval,
-                                                          COLUMN_LIST, lookBackHours, startDate, endDate)
+            st.write("currentStrategy: " + currentStrategy)
+            st.write("ticker_symbol: " + ticker_symbol)
+            st.write("interval: " + interval)
+            st.write("lookBackHours: " + lookBackHours)
+            st.write("startDate: " + startDate)
+            st.write("endDate: " + endDate)
+            p_strategy = createStrategyInstanceFromString(currentStrategy, ticker_symbol, interval, lookBackHours, startDate, endDate)
             if p_strategy is None:
                 st.write("Something wrong with the strategy option")
             else:
@@ -55,7 +60,7 @@ if currentStrategy != 'Choose':
     if retrieveMethod == 'lookback':
         lookBackHours = st.slider('Look back period in hours: ', 1, 300, 24)
         st.write('You have choosed:', str(lookBackHours // 24) + ' days and ' + str(lookBackHours % 24) + " hours")
-        lookBackHours = str(lookBackHours)
+        lookBackHours = str(lookBackHours) + " hours"
     elif retrieveMethod == 'dateRange':
         st.markdown("<h3 style='text-align: center'>or</h3>", unsafe_allow_html=True)
         appointment = st.slider("Select Range", min_value=datetime.date(2020, 12, 18), max_value=datetime.date.today(),

@@ -21,7 +21,7 @@ from utils import Utilities
 
 
 class Strategy:
-    def __init__(self, ticker, interval, columns, lookback_time, startDate, endDate, api_key="", api_secret=""):
+    def __init__(self, ticker, interval, lookback_time, startDate, endDate, api_key="", api_secret=""):
 
         if api_key == "" and api_secret == "":
             data = GetHistoricalData(ticker, interval, lookback_time, startDate, endDate, api_key="", api_secret="")
@@ -45,7 +45,7 @@ class Strategy:
         return self.df.merge(fearAndGreedIndex, on=fearAndGreedIndex.index.name)
 
     @abstractmethod
-    def _calculateValuesForDf(self, columns):
+    def _calculateValuesForDf(self):
         pass
 
     @abstractmethod

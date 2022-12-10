@@ -37,7 +37,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from strategies.Strategy import Strategy
-
+import streamlit as st
 
 # this price is equal with the percent of each trade
 def calculateProfit(merged):
@@ -48,16 +48,14 @@ class BollingerBand(Strategy):
     ticker = ""
     interval = ""
     df = pd.DataFrame()
-    COLUMN_LIST = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
 
-    def __init__(self, ticker, interval, columns, lookback_time, startDate, endDate, api_key="", api_secret=""):
-        super(BollingerBand, self).__init__(ticker, interval, columns, lookback_time, startDate, endDate, api_key, api_secret)
+    def __init__(self, ticker, interval, lookback_time, startDate, endDate, api_key="", api_secret=""):
+        super(BollingerBand, self).__init__(ticker, interval, lookback_time, startDate, endDate, api_key, api_secret)
         # clean the dataframe adn set values for column
-        self._calculateValuesForDf(columns)
+        self._calculateValuesForDf()
 
     # calculate sma, std upper and lower band and signal and clear na:
-    def _calculateValuesForDf(self, columns):
-        self.df = self.df.set_index(self.COLUMN_LIST[0])
+    def _calculateValuesForDf(self):
         self.df['STD'] = self.df.Close.rolling(window=20).std()
         self.df['SMA'] = self.df.Close.rolling(window=20).mean()
         self.df['upper'] = self.df.SMA + 2 * self.df.STD

@@ -31,29 +31,26 @@ import pandas as pd
 import ta
 from ta import momentum, trend
 
-from utils import constants
-
-
 # backtest should have:
 #   - sell and buy signals
 #
 # strategy should have
 #   - a logi behind it
 class StochRSIMACD(Strategy):
-    def __init__(self, ticker, interval, columns, lookback_time, startDate, endDate, api_key="", api_secret=""):
-        super(StochRSIMACD, self).__init__(ticker, interval, columns, lookback_time, startDate, endDate, api_key,
+    def __init__(self, ticker, interval, lookback_time, startDate, endDate, api_key="", api_secret=""):
+        super(StochRSIMACD, self).__init__(ticker, interval, lookback_time, startDate, endDate, api_key,
                                            api_secret)
         # clean the dataframe and set values for column
         self.actual_trades = None
-        self._calculateValuesForDf(columns)
+        self._calculateValuesForDf()
 
-    def _calculateValuesForDf(self, columns):
+    def _calculateValuesForDf(self):
         self._applyTechnicals()
         self.decide()
 
     def getBuyDatesForTradingBot(self):
-        #print("actual trades: ")
-        #print(self.actual_trades)
+        # print("actual trades: ")
+        # print(self.actual_trades)
         return self.df.loc[self.actual_trades["Buying_dates"]]
 
     def getTrigger(self, lags, buy=True):
@@ -85,16 +82,16 @@ class StochRSIMACD(Strategy):
             # if my buying column contains a signal
             if self.df.Buy.iloc[i]:
                 self.buydates.append(self.df.iloc[i + 1].name)
-                #newDf = pd.DataFrame([self.df.iloc[i + 1].name])
-                #self.buydates = pd.concat([self.buydates, newDf])
+                # newDf = pd.DataFrame([self.df.iloc[i + 1].name])
+                # self.buydates = pd.concat([self.buydates, newDf])
                 # when I have appended a date I'm checking when my selling date is fulfilled
                 # num =  number of iteration
                 # j = the value of the Sell column in the numth iteration
                 for num, j in enumerate(self.df.Sell[i:]):
                     if j:
                         self.selldates.append(self.df.iloc[i + num + 1].name)
-                        #newDf = pd.DataFrame([self.df.iloc[i + num + 1].name])
-                        #self.selldates = pd.concat([self.selldates, newDf])
+                        # newDf = pd.DataFrame([self.df.iloc[i + num + 1].name])
+                        # self.selldates = pd.concat([self.selldates, newDf])
                         break
 
         # if I have one extra buying date
@@ -126,5 +123,5 @@ class StochRSIMACD(Strategy):
 # hej = StochRSIMACD('BTCUSDT', '5m', constants.COLUMN_LIST, '240', 'noStartDate', 'noEndDate')
 # hej.plot()
 
-hej = StochRSIMACD('BTCUSDT', '1m', constants.COLUMN_LIST, '10 min', 'noStartDate', 'noEndDate', api_key="public",
+hej = StochRSIMACD('BTCUSDT', '1m', '10 min', 'noStartDate', 'noEndDate', api_key="public",
                    api_secret="private")

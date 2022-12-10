@@ -12,19 +12,19 @@ import re
 
 
 
-def createStrategyInstanceFromString(p_strategy, ticker_symbol, interval, column_list, lookBackHours, startDate,
+def createStrategyInstanceFromString(p_strategy, ticker_symbol, interval, lookBackHours, startDate,
                                      endDate, api_key="", api_secret=""):
     if p_strategy == "BollingerBand":
-        return BollingerBand.BollingerBand(ticker_symbol, interval, column_list, lookBackHours, startDate,
+        return BollingerBand.BollingerBand(ticker_symbol, interval, lookBackHours, startDate,
                                            endDate, api_key, api_secret)
     elif p_strategy == "MeanReversion":
-        return MeanReversion.MeanReversion(ticker_symbol, interval, column_list, lookBackHours, startDate,
+        return MeanReversion.MeanReversion(ticker_symbol, interval, lookBackHours, startDate,
                                            endDate,api_key, api_secret)
     elif p_strategy == "RegressionModels":
-        return RegressionModels.RegressionModels(ticker_symbol, interval, column_list, lookBackHours,
+        return RegressionModels.RegressionModels(ticker_symbol, interval, lookBackHours,
                                                  startDate, endDate,api_key, api_secret)
     elif p_strategy == "StochRSIMACD":
-        return StochRSIMACD.StochRSIMACD(ticker_symbol, interval, column_list, lookBackHours, startDate,
+        return StochRSIMACD.StochRSIMACD(ticker_symbol, interval, lookBackHours, startDate,
                                          endDate,api_key, api_secret)
     else:
         return None
