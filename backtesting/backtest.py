@@ -28,11 +28,11 @@ def get_formatted_series(series):
 class Backtest:
     # noinspection PyProtectedMember
     def __init__(self, strategy):
-        self._sellprices = strategy.buyprices
-        self._buyprices = strategy.sellprices
+        self.buyprices = strategy.buyprices
+        self.sellprices = strategy.sellprices
         self.relative_returns = pd.Series(
-            [(self._sellprices - self._buyprices) / self._buyprices for self._sellprices, self._buyprices
-             in zip(self._sellprices, self._buyprices)])
+            [(self.sellprices - self.buyprices) / self.buyprices for self.sellprices, self.buyprices
+             in zip(self.sellprices, self.buyprices)])
 
     def get_relative_returns(self):
         return get_formatted_series(self.relative_returns.copy())

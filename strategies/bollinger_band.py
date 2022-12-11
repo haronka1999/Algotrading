@@ -37,6 +37,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from strategies.strategy import Strategy
+from utils import constants
 
 
 # this price is equal with the percent of each trade
@@ -90,13 +91,18 @@ class BollingerBand(Strategy):
                     self.sellprices.append(self.df.iloc[i].Close)
                     open_pos = False
 
+        cut = len(self.buydates) - len(self.selldates)
+        if cut:
+            self.buydates = self.buydates[:-cut]
+            self.buyprices = self.buyprices[:-cut]
+
     def plot(self):
         plt.figure(figsize=(25, 6))
         # plt.plot(self.df[['Close', 'SMA', 'upper', 'lower']])
         plt.plot(self.df[['Close']])
         # x-axis the time of buy_signal y Axis is the price at the price time
-        plt.scatter(self.buydates, self.buyprices, marker='^', color='g', s=70)
-        plt.scatter(self.selldates, self.sellprices, marker='^', color='y', s=70)
+        plt.scatter(self.buydates, self.buyprices, marker='^', color='g', s=constants.marker_size)
+        plt.scatter(self.selldates, self.sellprices, marker='^', color='y', s=constants.marker_size)
         # plt.fill_between(self.df.index, self.df.upper, self.df.lower, color='grey', alpha=0.3)
         plt.legend(['Close', 'SMA', 'upper', 'lower'])
         return plt

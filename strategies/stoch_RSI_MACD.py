@@ -30,6 +30,10 @@ import numpy as np
 import pandas as pd
 import ta
 from ta import momentum, trend
+import streamlit as st
+
+from utils import constants
+
 
 # backtest should have:
 #   - sell and buy signals
@@ -41,17 +45,13 @@ class StochRSIMACD(Strategy):
         super(StochRSIMACD, self).__init__(ticker, interval, lookback_time, start_date, end_date, api_key,
                                            api_secret)
         # clean the dataframe and set values for column
+        self.lags = 20
+        self.actual_trades = pd.DataFrame()
         self.calculate_values_for_df()
-        self.actual_trades = None
-        # self.actual_trades = pd.DataFrame({
-        #     'Buy Dates': self.buydates,
-        #     'Buy Price': self.df.Open[self.buydates],
-        #     'Sell Date': self.selldates,
-        #     'Sell Price': self.df.Open[self.selldates]
-        # })
+        print("hej")
 
     def calculate_values_for_df(self):
-        self._applyTechnicals()
+        self.apply_technicals()
         self.decide()
 
     def get_trigger(self, lags, buy=True):
@@ -67,8 +67,8 @@ class StochRSIMACD(Strategy):
 
     # check if the trigger is fulfilled and buying condition fulfilled
     def decide(self):
-        self.df['Buytrigger'] = np.where(self.get_trigger(20), 1, 0)
-        self.df['Selltrigger'] = np.where(self.get_trigger(20, False), 1, 0)
+        self.df['Buytrigger'] = np.where(self.get_trigger(self.lags), 1, 0)
+        self.df['Selltrigger'] = np.where(self.get_trigger(self.lags, False), 1, 0)
 
         self.df['Buy'] = np.where(
             (self.df['Buytrigger']) & (self.df['%K'].between(20, 80)) & (self.df['%D'].between(20, 80)) & (
@@ -78,7 +78,6 @@ class StochRSIMACD(Strategy):
             (self.df['Selltrigger']) & (self.df['%K'].between(20, 80)) & (self.df['%D'].between(20, 80)) & (
                     self.df.rsi < 50) & (self.df.macd < 0), 1, 0)
 
-        # Buying_dates, Selling_dates = [], []
         for i in range(len(self.df) - 1):
             # if my buying column contains a signal
             if self.df.Buy.iloc[i]:
@@ -91,31 +90,29 @@ class StochRSIMACD(Strategy):
                         self.selldates.append(self.df.iloc[i + num + 1].name)
                         break
 
-        # if I have one extra buying date
+        # if I have one extra buying date delete it
         cut = len(self.buydates) - len(self.selldates)
         if cut:
             self.buydates = self.buydates[:-cut]
-        frame = pd.DataFrame({'Buying_dates': self.buydates, 'Selling_dates': self.selldates})
+            self.buyprices = self.buyprices[:-cut]
 
-        # avoid parallel trades we have to cut overlapping trades
-        self.actual_trades = frame[frame.Buying_dates > frame.Selling_dates.shift(1)]
+        self.create_actual_trades()
 
-    def _applyTechnicals(self):
+    def apply_technicals(self):
         self.df['%K'] = ta.momentum.stoch(self.df.High, self.df.Low, self.df.Close, window=14, smooth_window=3)
         self.df['%D'] = self.df['%K'].rolling(3).mean()
         self.df['rsi'] = ta.momentum.rsi(self.df.Close, window=14)
         self.df['macd'] = ta.trend.macd_diff(self.df.Close)
-        # self.df.dropna(inplace=True)
+        self.df.dropna(inplace=True)
 
     def plot(self):
         plt.figure(figsize=(20, 10))
         plt.plot(self.df.Close, color='k', alpha=0.7)
 
-        plt.scatter(self.buydates, self.df.Open[self.buydates], marker='^',
-                    color='g', s=500)
-        plt.scatter(self.selldates, self.df.Open[self.selldates], marker='v',
-                    color='r', s=500)
-
+        plt.scatter(self.actual_trades['Buy Date'], self.actual_trades['Buy Price'], marker='^',
+                    color='g', s=constants.marker_size)
+        plt.scatter(self.actual_trades['Sell Date'], self.actual_trades['Sell Price'], marker='v',
+                    color='r', s=constants.marker_size)
 
         # plt.scatter(self.actual_trades.Buying_dates, self.df.Open[self.actual_trades.Buying_dates], marker='^',
         #             color='g', s=500)
@@ -123,3 +120,26 @@ class StochRSIMACD(Strategy):
         #             color='r', s=500)
         return plt
         # plt.show()
+
+    def create_actual_trades(self):
+        temp_frame = pd.DataFrame(
+            {'Buy Date': self.buydates, 'Sell Date': self.selldates})
+        # avoid parallel trades we have to cut overlapping trades
+        frame = temp_frame[temp_frame['Buy Date'] > temp_frame['Sell Date'].shift(1)]
+
+
+        self.buydates = frame['Buy Date']
+        self.buydates.reset_index(drop=True, inplace=True)
+        self.selldates = frame['Sell Date']
+        self.selldates.reset_index(drop=True, inplace=True)
+        self.buyprices = self.df.Open[self.buydates]
+        self.buyprices.reset_index(drop=True, inplace=True)
+        self.sellprices = self.df.Open[self.selldates]
+        self.sellprices.reset_index(drop=True, inplace=True)
+
+        self.actual_trades = pd.DataFrame({
+            'Buy Date': self.buydates,
+            'Buy Price': self.buyprices,
+            'Sell Date': self.selldates,
+            'Sell Price': self.sellprices
+        })

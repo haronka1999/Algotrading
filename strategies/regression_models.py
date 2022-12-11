@@ -6,17 +6,17 @@
 Video: https://www.youtube.com/watch?v=AXBhrLongC8&t=430s
 Description
 
-Taking past data to predict future return if the return is positive we hold,
+Taking past data to predict future return is positive we hold,
 otherwise the asset should be shorted
----------------------------------------------------------------------------
+---------------------------------------------------------------------------return if the r
 """
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
-
-from strategies.Strategy import Strategy
+from strategies.strategy import Strategy
 
 
 def _plot(X, y, y_pred, model):
@@ -33,13 +33,10 @@ def _plot(X, y, y_pred, model):
 
 
 class RegressionModels(Strategy):
-    df = pd.DataFrame()
-    COLUMN_LIST = ['Time', 'Open']
-
-    def __init__(self, ticker, interval, columns, lookbackHours, startDate, endDate):
-        super(RegressionModels, self).__init__(ticker, interval, columns, lookbackHours, startDate, endDate)
+    def __init__(self, ticker, interval, lookback_time, startDate, end_date, api_key="", api_secret=""):
+        super(RegressionModels, self).__init__(ticker, interval, lookback_time, startDate, end_date, api_key, api_secret)
         # clean the dataframe and set values for column
-        self._calculateValuesForDf(columns)
+        self.calculate_values_for_df()
         print(self.df.head(30))
 
     def plotLinearRegression(self):
@@ -58,7 +55,7 @@ class RegressionModels(Strategy):
         return df_pred, model
 
     # TODO: check datei
-    def _calculateValuesForDf(self, columns):
+    def calculate_values_for_df(self):
         pass
         # (self.df.Time.to_datetime())
         # self.df.Time.to_timestamp()

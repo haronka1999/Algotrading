@@ -29,6 +29,8 @@ import pandas as pd
 from ta import momentum
 from matplotlib import pyplot as plt
 from strategies.strategy import Strategy
+from utils import constants
+
 
 class MeanReversion(Strategy):
     def __init__(self, ticker, interval, lookback_time, start_date, end_date, api_key="", api_secret=""):
@@ -36,22 +38,25 @@ class MeanReversion(Strategy):
         super(MeanReversion, self).__init__(ticker, interval, lookback_time, start_date, end_date, api_key, api_secret)
         # clean the dataframe adn set values for column
         self.calculate_values_for_df()
+        self.actual_trades = pd.DataFrame({
+            'Buy Date': self.buydates,
+            'Buy Price': self.buyprices,
+            'Sell Date': self.selldates,
+            'Sell Price': self.sellprices
+        })
 
     def plot(self):
         plt.figure(figsize=(23, 6))
         # plt.plot(self.df[['Close', 'SMA_20', 'upper_band', 'lower_band']])
         plt.plot(self.df[['Close']])
-        plt.scatter(self.df.loc[self.buydates].index, self.df.loc[self.buydates].Close, marker='^', c='y')
-        plt.scatter(self.df.loc[self.selldates].index, self.df.loc[self.selldates].Close, marker='v', c='g')
+        plt.scatter(self.df.loc[self.buydates].index, self.df.loc[self.buydates].Close, marker='^', c='y',
+                    s=constants.marker_size)
+        plt.scatter(self.df.loc[self.selldates].index, self.df.loc[self.selldates].Close, marker='v', c='g',
+                    s=constants.marker_size)
+        return plt
         # plt.fill_between(self.df.index, self.df.upper_band, self.df.lower_band, color='grey', alpha=0.8)
         # plt.legend(['Close', 'SMA_20', 'upper_band', 'lower_band'])
-        plt.show()
-
-    def get_sellprices(self):
-        return self.sellprices
-
-    def get_buyprices(self):
-        return self.buyprices
+        # plt.show()
 
     def calculate_values_for_df(self):
         self.df['SMA_20'] = self.df.Close.rolling(20).mean()
@@ -85,7 +90,14 @@ class MeanReversion(Strategy):
                 position = True
 
             if position:
-                if (row['signal'] == 'Sell') or (len(self.buyprices) != 0 and row['shifted_Close'] < 0.98 * self.buyprices[-1]):
+                if (row['signal'] == 'Sell') or (
+                        len(self.buyprices) != 0 and row['shifted_Close'] < 0.98 * self.buyprices[-1]):
                     self.selldates.append(index)
                     self.sellprices.append(row.Close)
                     position = False
+
+        # if I have one extra buying date delete it
+        cut = len(self.buydates) - len(self.selldates)
+        if cut:
+            self.buydates = self.buydates[:-cut]
+            self.buyprices = self.buyprices[:-cut]
