@@ -20,9 +20,9 @@ It needs to implement two type of data fetching:
     2. and data from the current date to a lookback period
 """
 import os.path
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from utils.constants import no_start_date, no_end_date, no_lookback_time,COLUMN_LIST
+from utils.constants import no_start_date, no_end_date, no_lookback_time, COLUMN_LIST
 from binance.client import Client
 import pandas as pd
 import sys
@@ -36,6 +36,7 @@ def check_date_validity(date_text):
         datetime.strptime(date_text, DATE_FORMAT)
     except ValueError:
         raise ValueError("Incorrect data format, should be yyyy-mm-dd")
+
 
 class GetHistoricalData:
 
@@ -83,14 +84,9 @@ class GetHistoricalData:
     def clean_dataframe(self):
         self.frame = self.frame.iloc[:, :6]
         self.frame.columns = COLUMN_LIST
-        self.frame.Time = self.frame.Time.astype(float)
-        self.frame.Time = pd.to_datetime(self.frame.Time / 1000, unit='s')
         self.frame = self.frame.set_index(COLUMN_LIST[0])
-        self.frame.Open = self.frame.Open.astype(float)
-        self.frame.High = self.frame.High.astype(float)
-        self.frame.Low = self.frame.Low.astype(float)
-        self.frame.Close = self.frame.Close.astype(float)
-
+        self.frame.index = pd.to_datetime(self.frame.index, unit='ms')
+        self.frame.index = self.frame.index + timedelta(hours=2)
+        self.frame = self.frame.astype(float)
 
 # he = GetHistoricalData(ticker="ADAUSDT", startDate="2022-05-12", endDate=today, lookbackHours="-1",interval="1d")
-
