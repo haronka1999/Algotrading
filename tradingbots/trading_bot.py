@@ -15,11 +15,10 @@ Target Profit the x% of the buying price  (100.5%)
 import time
 from binance import Client
 from binance.exceptions import BinanceAPIException
-from pages.utils_ui.utils import create_strategy_instance_from_string
+from utils.utils_ui import create_strategy_instance_from_string, get_strategy_class_names
 from strategies.stoch_RSI_MACD import StochRSIMACD
-from utils import constants
-from utils.utilities import get_strategy_class_names
 import streamlit as st
+
 
 class_names = get_strategy_class_names()
 
@@ -44,11 +43,13 @@ class TradingBot:
         if self.error_message.strip() != "":
             print(self.error_message)
             return
-
-        # initialize trading bot
-        while True:
-            self.apply_strategy(pair, 0.0001)
-            time.sleep(0.5)
+        #order = self.client.create_order(symbol=pair, side='BUY', type='MARKET', quantity=10)
+        print(self.client.get_symbol_info("HNTUSDT"))
+        #print(order)
+        # # initialize trading bot
+        # while True:
+        #     self.apply_strategy(pair, 0.0001)
+        #     time.sleep(0.5)
 
     def apply_strategy(self, pair, qty, open_position=False):
         buy_price = 0

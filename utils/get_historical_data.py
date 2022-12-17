@@ -39,8 +39,20 @@ def check_date_validity(date_text):
 
 
 class GetHistoricalData:
+    """
+    A utility class for getting the historical values for cryptocurrencies
+    """
 
-    def __init__(self, ticker, interval, lookback_time, start_date, end_date, api_key="", api_secret=""):
+    def __init__(self, ticker: str, interval: str, lookback_time: str, start_date: str, end_date: str, api_key="", api_secret=""):
+        """
+        :param ticker: the symbol-pair of the given value. Ex. "BTCUSDT"
+        :param interval:  the timestep for each data candle
+        :param lookback_time: the time in hours or minutes of the retreiving
+        :param start_date: the first day of the timeframe (format ex. 2022-12-25)
+        :param end_date: the last day of the timeframe (Note: choose or lookback_time or the start_date and end_date)
+        :param api_key:  the public key, generated from binance (if not given, trading is not possible)
+        :param api_secret:  the secret key generated from binance (if not given, trading is not possible)
+        """
         self.frame = pd.DataFrame()
         self.client = Client(api_key, api_secret)
         self.ticker = ticker

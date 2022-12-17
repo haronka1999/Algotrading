@@ -1,8 +1,8 @@
 import streamlit as st
 import datetime
 from backtesting.backtest import Backtest
-from pages.utils_ui.utils import create_strategy_instance_from_string, validateInputs
-from utils.utilities import get_strategy_class_names
+from utils.utils_ui import create_strategy_instance_from_string, validateInputs, get_strategy_class_names
+from utils.utilities import Utilities
 from utils import constants
 
 
@@ -10,6 +10,7 @@ class BacktestUI:
     """
     Use this class to encapsulate the attributes and functionalities for this UI page
     """
+
     def __init__(self, p_current_strategy_name, p_ticker_symbol, p_interval, p_lookback_time, p_start_date, p_end_date):
         self.current_strategy_name = p_current_strategy_name
         self.ticker_symbol = p_ticker_symbol
@@ -36,10 +37,9 @@ class BacktestUI:
                 # st.write("endDate: " + self.end_date)
                 return "Good"
 
-
-
     def retrieve_strategy_object(self):
-        self.strategy = create_strategy_instance_from_string(self.current_strategy_name, self.ticker_symbol, self.interval,
+        self.strategy = create_strategy_instance_from_string(self.current_strategy_name, self.ticker_symbol,
+                                                             self.interval,
                                                              self.lookback_time, self.start_date, self.end_date)
         if self.strategy is None:
             st.error("Something wrong with the strategy option")
@@ -61,8 +61,9 @@ class BacktestUI:
         st.dataframe(self.strategy.df)
 
 
-
-current_strategy_name = st.selectbox('Choose a predefined strategy', get_strategy_class_names())
+class_names = get_strategy_class_names()
+class_names.insert(0, constants.default_strategy_str)
+current_strategy_name = st.selectbox('Choose a predefined strategy', class_names)
 
 if current_strategy_name == 'RegressionModels':
     st.write("Implementation is coming soon ...")
@@ -85,11 +86,10 @@ elif current_strategy_name != 'Choose':
         start_date = str(appointment[0])
         end_date = str(appointment[1])
 
-    backTestUI = BacktestUI(current_strategy_name,ticker_symbol, interval, lookback_time, start_date,end_date)
+    backTestUI = BacktestUI(current_strategy_name, ticker_symbol, interval, lookback_time, start_date, end_date)
 
     if backTestUI.submit_form() is not None:
         with st.spinner('Wait for it...'):
             backTestUI.retrieve_strategy_object()
         if backTestUI.strategy is not None:
             backTestUI.draw()
-

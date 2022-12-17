@@ -1,36 +1,37 @@
-"""
---------------------  Revision History: ----------------------------------------
-* 2022-10-15    -   File Created
-# 2022-11-24    -   Implementation started
-# 2022-12-07    -   Implementation done:
-                    -  the UI is working (only tested on STOCHMACDRSI
---------------------------------------------------------------------------------
-Description:
-
-This code is responsible for displaying the UI for launching Bots
-"""
-
 import streamlit as st
+
+from utils.utils_ui import get_strategy_class_names
 from tradingbots.trading_bot import TradingBot
 from utils import constants
-from utils.utilities import get_strategy_class_names
 
-# GLOBAL VARIABLES
-ticker_symbol = ""
-interval = ""
-class_names = get_strategy_class_names()
-class_names.insert(0, constants.default_strategy_str)
-current_strategy = st.selectbox('Choose a predefined strategy', help="Choose", options=class_names)
+class AppyStrategyUI:
+    """
+    Responsible for encapsulating and displaying the UI for launching trading Bots
+    """
+    def __init__(self):
+        self.private_key = ""
+        self.public_key = ""
+        self.quantity = ""
+        self.ticker_symbol = ""
+        self.interval = ""
+        self.class_names = get_strategy_class_names()
+        self.class_names.insert(0, constants.default_strategy_str)
+
+    def retrieve_inputs(self):
+        self.ticker_symbol = st.text_input('Ticker symbol:', placeholder='ex. BTCBUSD, ETHBUSD, ADABUSD, etc')
+        self.interval = st.text_input('Candle chart interval:', placeholder='ex.1m, 5m, 15m, 30m, 1h, 4h etc.')
+        self.quantity = st.number_input('Choose the amount of USD dollars to be invested:')
+        self.public_key = st.text_input('Please enter your Binance Public Key')
+        self.private_key = st.text_input('Please enter your Binance Private Key')
+
+
+applyUI = AppyStrategyUI()
+current_strategy = st.selectbox('Choose a predefined strategy', help="Choose", options=applyUI.class_names)
 
 st.write("The current strategies are working: STOCHRSI")
 if current_strategy != constants.default_strategy_str:
     # retrieve inputs:
-    ticker_symbol = st.text_input('Ticker symbol:', placeholder='ex. BTCBUSD, ETHBUSD, ADABUSD, etc')
-    interval = st.text_input('Candle chart interval:', placeholder='ex.1m, 5m, 15m, 30m, 1h, 4h etc.')
-    quantity = st.number_input('Choose the amount of USD dollars to be invested:')
-    public_key = st.text_input('Please enter your Binance Public Key')
-    private_key = st.text_input('Please enter your Binance Private Key')
-
+    applyUI.retrieve_inputs()
     if st.button('Submit'):
-        strategy = TradingBot(ticker_symbol, current_strategy, quantity, interval,
-                              constants.lookback_time_for_bots, public_key, private_key)
+        strategy = TradingBot(applyUI.ticker_symbol, current_strategy, applyUI.quantity, applyUI.interval,
+                              constants.lookback_time_for_bots, applyUI.public_key, applyUI.private_key)
