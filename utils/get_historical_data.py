@@ -22,7 +22,7 @@ It needs to implement two type of data fetching:
 import os.path
 from datetime import datetime, timedelta
 
-from utils.constants import no_start_date, no_end_date, no_lookback_time, COLUMN_LIST
+from utils.constants import Constants
 from binance.client import Client
 import pandas as pd
 import sys
@@ -64,18 +64,18 @@ class GetHistoricalData:
         self.populate_dataframe_from_binance()
 
     def populate_dataframe_from_binance(self):
-        if self.start_date != no_start_date and self.end_date != no_end_date and self.lookback_time == no_lookback_time:
+        if self.start_date != Constants.NO_START_DATE and self.end_date != Constants.NO_END_DATE and self.lookback_time == Constants.NO_LOOKBACK_TIME:
             check_date_validity(self.start_date)
             check_date_validity(self.end_date)
             self.getDataBetweenDates(self.start_date, self.end_date)
-        elif self.lookback_time != no_lookback_time and self.start_date == no_start_date and self.end_date == no_end_date:
+        elif self.lookback_time != Constants.NO_LOOKBACK_TIME and self.start_date == Constants.NO_START_DATE and self.end_date == Constants.NO_END_DATE:
             self.retrieve_current_data(self.lookback_time)
         else:
             print("something wrong with the parameters, please try again")
             sys.exit()
 
     def check_parameters(self):
-        if self.start_date == no_start_date and self.end_date == no_end_date and self.lookback_time == no_lookback_time:
+        if self.start_date == Constants.NO_START_DATE and self.end_date == Constants.NO_END_DATE and self.lookback_time == Constants.NO_LOOKBACK_TIME:
             print("No parameters were given.\nPlease give a lookback period or two dates!")
             sys.exit()
 
@@ -95,8 +95,8 @@ class GetHistoricalData:
 
     def clean_dataframe(self):
         self.frame = self.frame.iloc[:, :6]
-        self.frame.columns = COLUMN_LIST
-        self.frame = self.frame.set_index(COLUMN_LIST[0])
+        self.frame.columns = Constants.COLUMN_LIST
+        self.frame = self.frame.set_index(Constants.COLUMN_LIST[0])
         self.frame.index = pd.to_datetime(self.frame.index, unit='ms')
         self.frame.index = self.frame.index + timedelta(hours=2)
         self.frame = self.frame.astype(float)

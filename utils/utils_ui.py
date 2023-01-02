@@ -14,7 +14,7 @@ import os
 import streamlit as st
 from feedparser import parse
 from bs4 import BeautifulSoup
-from utils.constants import no_start_date, no_end_date
+from utils.constants import Constants
 from utils.get_historical_data import GetHistoricalData
 
 
@@ -24,7 +24,7 @@ def get_strategy_class_names() -> list[str]:
     :return:  a list with the strategy classnames
     """
     class_names = []
-    directory = os.path.join("..", "AlgoTrading", "strategies")
+    directory = os.path.join("..", "..", "AlgoTrading", "strategies")
     for filename in os.listdir(directory):
         if filename.endswith(".py"):
             with open(os.path.join(directory, filename)) as topo_file:
@@ -46,14 +46,12 @@ def get_crypto_prices(ticker_list: list) -> pd.DataFrame:
     price_col_values = []
     last_time_updated = []
     for symbol in ticker_list:
-        crypto_price = GetHistoricalData(symbol, "1m", "3 min", no_start_date, no_end_date)
+        crypto_price = GetHistoricalData(symbol, "1m", "3 min", Constants.NO_START_DATE, Constants.NO_END_DATE)
         # convert to datetime so we can extract only the time than cut the seconds from the end of the string
         last_time_updated.append(str(pd.to_datetime(crypto_price.frame.iloc[-1].name).time())[:-3])
         price_col_values.append(crypto_price.frame.Close.iloc[-1])
     df = pd.DataFrame({"Symbol": ticker_list, "Price": price_col_values, "Last Updated": last_time_updated})
     return df
-
-
 
 
 def add_articles(articles):

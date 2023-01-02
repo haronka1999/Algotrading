@@ -1,46 +1,33 @@
-"""
---------------------  Revision History: ----------------------------------------
-# 2022-11-11    -   Class created basic functionalities implemented
-* 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
-                    - class corrected  and got it's first form (not compatible with UI and Backtest yet
---------------------------------------------------------------------------------
-Video: https://www.youtube.com/watch?v=r8pU-8l1KPU
-Description:
-Indicators used:
-    - %d = stochastic slow
-    - %k = k line
-    - RSI and MACD
-
-Buying conditions:
-    - %d and %k should be between 20-80
-    - RSI >  50
-    - MACD cross the signal line (must be the difference positive)
-
-Selling Condition:
-    - k and d lines above 20 and below 80
-    - after the kand d line above 80
-    - RSI < 50
-    - signal line should cross the MACD line
----------------------------------------------------------------------------
-"""
 from matplotlib import pyplot as plt
-
 from strategies.strategy import Strategy
 import numpy as np
 import pandas as pd
 import ta
 from ta import momentum, trend
-import streamlit as st
-
-from utils import constants
+from utils.constants import Constants
 
 
-# backtest should have:
-#   - sell and buy signals
-#
-# strategy should have
-#   - a logi behind it
 class StochRSIMACD(Strategy):
+    """
+    Video: https://www.youtube.com/watch?v=r8pU-8l1KPU
+    Description:
+    Indicators used:
+        - %d = stochastic slow
+        - %k = k line
+        - RSI and MACD
+
+    Buying conditions:
+        - %d and %k should be between 20-80
+        - RSI >  50
+        - MACD cross the signal line (must be the difference positive)
+
+    Selling Condition:
+        - k and d lines above 20 and below 80
+        - after the kand d line above 80
+        - RSI < 50
+        - signal line should cross the MACD line
+    """
+
     def __init__(self, ticker, interval, lookback_time, start_date, end_date, api_key="", api_secret=""):
         super(StochRSIMACD, self).__init__(ticker, interval, lookback_time, start_date, end_date, api_key,
                                            api_secret)
@@ -48,7 +35,6 @@ class StochRSIMACD(Strategy):
         self.lags = 20
         self.actual_trades = pd.DataFrame()
         self.calculate_values_for_df()
-        print("hej")
 
     def calculate_values_for_df(self):
         self.apply_technicals()
@@ -110,23 +96,16 @@ class StochRSIMACD(Strategy):
         plt.plot(self.df.Close, color='k', alpha=0.7)
 
         plt.scatter(self.actual_trades['Buy Date'], self.actual_trades['Buy Price'], marker='^',
-                    color='g', s=constants.marker_size)
+                    color='g', s=Constants.MARKER_SIZE)
         plt.scatter(self.actual_trades['Sell Date'], self.actual_trades['Sell Price'], marker='v',
-                    color='r', s=constants.marker_size)
-
-        # plt.scatter(self.actual_trades.Buying_dates, self.df.Open[self.actual_trades.Buying_dates], marker='^',
-        #             color='g', s=500)
-        # plt.scatter(self.actual_trades.Selling_dates, self.df.Open[self.actual_trades.Selling_dates], marker='v',
-        #             color='r', s=500)
+                    color='r', s=Constants.MARKER_SIZE)
         return plt
-        # plt.show()
 
     def create_actual_trades(self):
         temp_frame = pd.DataFrame(
             {'Buy Date': self.buydates, 'Sell Date': self.selldates})
         # avoid parallel trades we have to cut overlapping trades
         frame = temp_frame[temp_frame['Buy Date'] > temp_frame['Sell Date'].shift(1)]
-
 
         self.buydates = frame['Buy Date']
         self.buydates.reset_index(drop=True, inplace=True)

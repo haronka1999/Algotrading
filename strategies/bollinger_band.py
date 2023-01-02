@@ -1,55 +1,39 @@
-"""
---------------------  Revision History: ----------------------------------------
-* 2022-10-15    -   Class Created
-* 2022-10-21    -   Class getting first Version (1.0 V)
-# 2022-10-22    -   Optimized code for backtest.py
-* 2022-11-16    -   Deleted default values for constructor's parameter list (it is handled in the UI side)
---------------------------------------------------------------------------------
-Video: https://www.youtube.com/watch?v=8PzQSgw0SpM&t=915s
-Description
-
-Bollinger bands consist three bands:
-Upper: SMA + 2*STD
-Middle: SMA
-Down: SMA -2*STD
-
-This measure volatility but most importantly overbuying and overselling
-
-and it should be used with other tech indicators
-
-Buying strategy:
-In this example we are selling when the upper trend is crossed, and we are buying when the down is crossed
-
-Problem is you can have more buy signal than sell signal ( vice versa )
-We handle this the following way:
-
-    - we open in the first buying signal and ignore the other
-    - we close in the first selling signal and ignore the other
-
-Notes:
-    - this strategy does not work well on bear market
-    - this strategy need improvement: risk management and handle unclosed positions!
-    - this is only 1 interpretation
------------------------------------------------------------------------------------
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from strategies.strategy import Strategy
 from utils import constants
-
-
-# this price is equal with the percent of each trade
-def calculateProfit(merged):
-    return (merged.shift(-1)['Sell Price'] - merged['Buy Price']) / merged['Buy Price'] * 100
+from utils.constants import Constants
 
 
 class BollingerBand(Strategy):
-    ticker = ""
-    interval = ""
-    df = pd.DataFrame()
+    """
+    Video: https://www.youtube.com/watch?v=8PzQSgw0SpM&t=915s
+    Description
 
+    Bollinger bands consist three bands:
+    Upper: SMA + 2*STD
+    Middle: SMA
+    Down: SMA -2*STD
+
+    This measure volatility but most importantly overbuying and overselling
+
+    and it should be used with other tech indicators
+
+    Buying strategy:
+    In this example we are selling when the upper trend is crossed, and we are buying when the down is crossed
+
+    Problem is you can have more buy signal than sell signal ( vice versa )
+    We handle this the following way:
+
+        - we open in the first buying signal and ignore the other
+        - we close in the first selling signal and ignore the other
+
+    Notes:
+        - this strategy does not work well on bear market
+        - this strategy need improvement: risk management and handle unclosed positions!
+        - this is only 1 interpretation
+    """
     def __init__(self, ticker, interval, lookback_time, start_date, end_date, api_key="", api_secret=""):
         super(BollingerBand, self).__init__(ticker, interval, lookback_time, start_date, end_date, api_key, api_secret)
         # clean the dataframe adn set values for column
@@ -68,8 +52,8 @@ class BollingerBand(Strategy):
         self.df['upper'] = self.df.SMA + 2 * self.df.STD
         self.df['lower'] = self.df.SMA - 2 * self.df.STD
 
-        self.df['Buy_Signal'] = np.where(self.df.lower > self.df.Close, True, False)
-        self.df['Sell_Signal'] = np.where(self.df.upper < self.df.Close, True, False)
+        self.df['Buy'] = np.where(self.df.lower > self.df.Close, 1, 0)
+        self.df['Sell'] = np.where(self.df.upper < self.df.Close, 1, 0)
         self.choose_signals()
         self.df = self.df.dropna()
 
@@ -101,8 +85,8 @@ class BollingerBand(Strategy):
         # plt.plot(self.df[['Close', 'SMA', 'upper', 'lower']])
         plt.plot(self.df[['Close']])
         # x-axis the time of buy_signal y Axis is the price at the price time
-        plt.scatter(self.buydates, self.buyprices, marker='^', color='g', s=constants.marker_size)
-        plt.scatter(self.selldates, self.sellprices, marker='^', color='y', s=constants.marker_size)
+        plt.scatter(self.buydates, self.buyprices, marker='^', color='g', s=Constants.MARKER_SIZE)
+        plt.scatter(self.selldates, self.sellprices, marker='^', color='y', s=Constants.MARKER_SIZE)
         # plt.fill_between(self.df.index, self.df.upper, self.df.lower, color='grey', alpha=0.3)
         plt.legend(['Close', 'SMA', 'upper', 'lower'])
         return plt

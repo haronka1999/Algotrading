@@ -1,13 +1,16 @@
 import streamlit as st
 
+from tradingbots.simulate_trading_bot import SimulateTradingBot
+from utils.constants import Constants
 from utils.utils_ui import get_strategy_class_names
-from tradingbots.trading_bot import TradingBot
 from utils import constants
+
 
 class AppyStrategyUI:
     """
     Responsible for encapsulating and displaying the UI for launching trading Bots
     """
+
     def __init__(self):
         self.private_key = ""
         self.public_key = ""
@@ -15,7 +18,7 @@ class AppyStrategyUI:
         self.ticker_symbol = ""
         self.interval = ""
         self.class_names = get_strategy_class_names()
-        self.class_names.insert(0, constants.default_strategy_str)
+        self.class_names.insert(0, Constants.DEFAULT_STRATEGY_STR)
 
     def retrieve_inputs(self):
         self.ticker_symbol = st.text_input('Ticker symbol:', placeholder='ex. BTCBUSD, ETHBUSD, ADABUSD, etc')
@@ -29,9 +32,9 @@ applyUI = AppyStrategyUI()
 current_strategy = st.selectbox('Choose a predefined strategy', help="Choose", options=applyUI.class_names)
 
 st.write("The current strategies are working: STOCHRSI")
-if current_strategy != constants.default_strategy_str:
+if current_strategy != Constants.DEFAULT_STRATEGY_STR:
     # retrieve inputs:
     applyUI.retrieve_inputs()
     if st.button('Submit'):
-        strategy = TradingBot(applyUI.ticker_symbol, current_strategy, applyUI.quantity, applyUI.interval,
-                              constants.lookback_time_for_bots, applyUI.public_key, applyUI.private_key)
+        strategy = SimulateTradingBot(applyUI.ticker_symbol, current_strategy, applyUI.quantity, applyUI.interval,
+                                      Constants.LOOKBACK_TIME_FOR_BOTS, applyUI.public_key, applyUI.private_key)

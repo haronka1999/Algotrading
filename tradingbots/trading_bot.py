@@ -12,6 +12,7 @@ STOP LOSS : the  x% of buying price (99.5%)
 Target Profit the x% of the buying price  (100.5%)
 ---------------------------------------------------------------------------
 """
+import sqlalchemy as db
 import time
 from binance import Client
 from binance.exceptions import BinanceAPIException
@@ -20,7 +21,7 @@ from strategies.stoch_RSI_MACD import StochRSIMACD
 import streamlit as st
 
 
-class_names = get_strategy_class_names()
+#class_names = get_strategy_class_names()
 
 # TODO:  display messages correctly on the display tab
 class TradingBot:
@@ -113,5 +114,9 @@ class TradingBot:
         error_message += self.create_test_order() + "\n"
         return error_message
 
+
+engine = db.create_engine("sqlite:///test.db")
+metadata = db.MetaData()
+print(metadata.tables.keys())
 
 # test = TradingBot("BTCBUSD", "StochRSIMACD", 10, "1m", '1000 min', api_key, api_secret)
