@@ -1,6 +1,6 @@
 import streamlit as st
 
-from utils.utils_ui import add_articles, generate_articles, get_crypto_prices
+from utils.utility_methods import add_articles, generate_articles, get_crypto_prices
 
 class HomeUI:
     """

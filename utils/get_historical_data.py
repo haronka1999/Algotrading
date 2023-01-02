@@ -1,39 +1,13 @@
-"""
---------------------  Revision History: ----------------------------------------
-* 2022-10-15    -   Class Created
-* 2022-10-21    -   Class getting first Version (1.0 V)
-* 2022-10-24    -   Optimizing speed: storing dataframes in csv file
-* 2022-11-16    -   Corrected the constructor's parameter list
-* 2022-12-07    -   Refactoring: generalize lookbackperiod (it can be minutes and hours)
---------------------------------------------------------------------------------
-Description:
-
-The class is responsible for fetching crypto related data
-
-Constructor is setting:
-    ticker: the symbol of the asset. ex: BTCUSDT
-    interval: how often should we get the data. ex 5m, 15m 20m, 1h etc
-    lookback: can be minutes or hours: example lookBack = '15 hours' or lookBack = '30 min'
-
-It needs to implement two type of data fetching:
-    1. between two dates
-    2. and data from the current date to a lookback period
-"""
-import os.path
 from datetime import datetime, timedelta
-
 from utils.constants import Constants
 from binance.client import Client
 import pandas as pd
 import sys
 
-PATH_TO_DATAFILES = os.path.join('..', 'utils', 'dataFiles')
-DATE_FORMAT = '%Y-%m-%d'
-
 
 def check_date_validity(date_text):
     try:
-        datetime.strptime(date_text, DATE_FORMAT)
+        datetime.strptime(date_text, Constants.DATE_FORMAT)
     except ValueError:
         raise ValueError("Incorrect data format, should be yyyy-mm-dd")
 
@@ -41,6 +15,16 @@ def check_date_validity(date_text):
 class GetHistoricalData:
     """
     A utility class for getting the historical values for cryptocurrencies
+    The class is responsible for fetching crypto related data from Binance
+
+    Constructor is setting:
+        ticker: the symbol of the asset. ex: BTCUSDT
+        interval: how often should we get the data. ex 5m, 15m 20m, 1h etc.
+        lookback: can be minutes or hours: example lookBack = '15 hours' or lookBack = '30 min'
+
+    It needs to implement two type of data fetching:
+        1. between two dates
+        2. and data from the current date to a lookback period
     """
 
     def __init__(self, ticker: str, interval: str, lookback_time: str, start_date: str, end_date: str, api_key="", api_secret=""):

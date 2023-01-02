@@ -6,7 +6,6 @@ Description:
     Implementing helper functions for UI
 ---------------------------------------------------------------------------
 """
-import pandas as pd
 
 from strategies import bollinger_band, mean_reversion, regression_models, stoch_RSI_MACD
 import re
@@ -16,7 +15,27 @@ from feedparser import parse
 from bs4 import BeautifulSoup
 from utils.constants import Constants
 from utils.get_historical_data import GetHistoricalData
+import requests
+import pandas as pd
 
+def get_fear_and_greed_DF() -> pd.DataFrame:
+    """
+    Possible strategies with fear and greed:
+        - Hold an asset until the fear and greed index is above 5
+        Notes:
+         - This should be used with an existing strategy
+    :return the dataframe with the fear and greed index. Possible merge by the dates
+    """
+    url = "https://api.alternative.me/fng/?limit=0"
+    r = requests.get(url)
+    df = pd.DataFrame(r.json()['data'])
+    df.value = df.value.astype(int)
+    df.timestamp = pd.to_datetime(df.timestamp, unit='s')
+    df = df.set_index('timestamp')
+    df.index.name = 'Date'
+    # revert to be the first date last
+    df = df[::-1]
+    return df
 
 def get_strategy_class_names() -> list[str]:
     """

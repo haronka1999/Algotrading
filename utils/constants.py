@@ -12,6 +12,7 @@ class Constants:
     NO_END_DATE = "noEndDate"
     LOOKBACK_TIME_FOR_BOTS = "5m"
     DEFAULT_STRATEGY_STR = "Choose"
+    DATE_FORMAT = '%Y-%m-%d'
 
 
 

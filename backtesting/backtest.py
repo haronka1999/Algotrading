@@ -1,16 +1,3 @@
-"""
---------------------  Revision History: ----------------------------------------
-* 2022-10-22    -   Class Created and first version created:
-                    implemented relative returns and cumulative returns
---------------------------------------------------------------------------------
-Video: https://www.youtube.com/watch?v=yTupVd6D9m8&ab_channel=Algovibes
-Version Number: 1.0 V
-Description:
-    A class where performance measures and backtesting libraries are implemented
-
-    The input parameter should be a sub instnace of strategy.py and
-    selldates, buydates, sellprices buyprices  attributes should be filled
-"""
 import pandas as pd
 
 def get_formatted_series(series):
@@ -26,7 +13,16 @@ def get_formatted_series(series):
 
 
 class Backtest:
-    # noinspection PyProtectedMember
+    """
+    Video: https://www.youtube.com/watch?v=yTupVd6D9m8&ab_channel=Algovibes
+    Version Number: 1.0 V
+    Description:
+        A class where performance measures and backtesting libraries are implemented
+
+        The input parameter should be a sub instnace of strategy.py and
+        selldates, buydates, sellprices buyprices  attributes should be filled
+    """
+
     def __init__(self, strategy):
         self.buyprices = strategy.buyprices
         self.sellprices = strategy.sellprices

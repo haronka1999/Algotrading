@@ -2,7 +2,7 @@ import time
 import datetime
 from binance import Client
 from utils.constants import  Constants
-from utils.utils_ui import create_strategy_instance_from_string, get_strategy_class_names
+from utils.utility_methods import create_strategy_instance_from_string, get_strategy_class_names
 import streamlit as st
 import csv
 

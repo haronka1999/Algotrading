@@ -1,10 +1,7 @@
 import streamlit as st
-
 from tradingbots.simulate_trading_bot import SimulateTradingBot
 from utils.constants import Constants
-from utils.utils_ui import get_strategy_class_names
-from utils import constants
-
+from utils.utility_methods import get_strategy_class_names
 
 class AppyStrategyUI:
     """

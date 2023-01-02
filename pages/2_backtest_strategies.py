@@ -1,9 +1,8 @@
 import streamlit as st
 import datetime
 from backtesting.backtest import Backtest
-from utils.utils_ui import create_strategy_instance_from_string, validateInputs, get_strategy_class_names
-from utils.utilities import Utilities
-from utils import constants
+from utils.constants import Constants
+from utils.utility_methods import create_strategy_instance_from_string, validateInputs, get_strategy_class_names
 
 
 class BacktestUI:
@@ -62,7 +61,7 @@ class BacktestUI:
 
 
 class_names = get_strategy_class_names()
-class_names.insert(0, constants.default_strategy_str)
+class_names.insert(0, Constants.DEFAULT_STRATEGY_STR)
 current_strategy_name = st.selectbox('Choose a predefined strategy', class_names)
 
 if current_strategy_name == 'RegressionModels':
@@ -73,9 +72,9 @@ elif current_strategy_name != 'Choose':
     interval = st.text_input('Candle chart interval:', placeholder='ex. 15m, 30m, 1h, 4h, 6h, 24h')
     retrieve_method = st.radio('Choose data retrieval method: lookback hours or date range: ',
                                ('lookback', 'dateRange'))
-    lookback_time = constants.no_lookback_time
-    start_date = constants.no_start_date
-    end_date = constants.no_end_date
+    lookback_time = Constants.NO_LOOKBACK_TIME
+    start_date = Constants.NO_START_DATE
+    end_date = Constants.NO_END_DATE
     if retrieve_method == 'lookback':
         lookback_time = st.slider('Look back period in hours: ', 1, 300, 24)
         st.write(f'You have chosen: {str(lookback_time // 24)} days and {str(lookback_time % 24)}  hours')

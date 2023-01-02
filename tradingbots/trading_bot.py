@@ -16,14 +16,13 @@ import sqlalchemy as db
 import time
 from binance import Client
 from binance.exceptions import BinanceAPIException
-from utils.utils_ui import create_strategy_instance_from_string, get_strategy_class_names
+from utils.utility_methods import create_strategy_instance_from_string, get_strategy_class_names
 from strategies.stoch_RSI_MACD import StochRSIMACD
 import streamlit as st
 
 
-#class_names = get_strategy_class_names()
+# class_names = get_strategy_class_names()
 
-# TODO:  display messages correctly on the display tab
 class TradingBot:
 
     def __init__(self, pair, chosen_strategy, quantity, interval, lookback_time, public_key, private_key):
