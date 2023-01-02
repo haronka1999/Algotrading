@@ -1,5 +1,5 @@
 import streamlit as st
-from tradingbots.simulate_trading_bot import SimulateTradingBot
+from tradingbots.trading_bot import TradingBot
 from utils.constants import Constants
 from utils.utility_methods import get_strategy_class_names
 
@@ -33,5 +33,5 @@ if current_strategy != Constants.DEFAULT_STRATEGY_STR:
     # retrieve inputs:
     applyUI.retrieve_inputs()
     if st.button('Submit'):
-        strategy = SimulateTradingBot(applyUI.ticker_symbol, current_strategy, applyUI.quantity, applyUI.interval,
-                                      Constants.LOOKBACK_TIME_FOR_BOTS, applyUI.public_key, applyUI.private_key)
+        strategy = TradingBot(applyUI.ticker_symbol, current_strategy, applyUI.quantity, applyUI.interval,
+                              Constants.LOOKBACK_TIME_FOR_BOTS, applyUI.public_key, applyUI.private_key)

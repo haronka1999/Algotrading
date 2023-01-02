@@ -1,121 +1,142 @@
-"""
---------------------  Revision History: ----------------------------------------
-# 2022-11-22    -   Class created
-# 2022-12-07    -   Class implemented
---------------------------------------------------------------------------------
-Video: https://www.youtube.com/watch?v=X50-c54BWV8&t=53s - bot
-        https://www.youtube.com/watch?v=VoDTVOJR3Og&t=52s - simulation of trading (no money)
-Description:
-Using the Strategy from strategies/STOCHRSIMACD.py
-
-STOP LOSS : the  x% of buying price (99.5%)
-Target Profit the x% of the buying price  (100.5%)
----------------------------------------------------------------------------
-"""
-import sqlalchemy as db
 import time
+import datetime
 from binance import Client
 from binance.exceptions import BinanceAPIException
+from utils.constants import Constants
 from utils.utility_methods import create_strategy_instance_from_string, get_strategy_class_names
-from strategies.stoch_RSI_MACD import StochRSIMACD
 import streamlit as st
+import csv
 
+class_names = get_strategy_class_names()
 
-# class_names = get_strategy_class_names()
 
 class TradingBot:
-
-    def __init__(self, pair, chosen_strategy, quantity, interval, lookback_time, public_key, private_key):
+    def __init__(self, pair, chosen_strategy, quantity, interval, public_key="", private_key="", is_simulation=True):
         # variables initialization
+        self.buy_price = 0
         self.public_key = public_key
         self.pair = pair
         self.private_key = private_key
-        self.quantity = float(quantity)
+        self.usd_amount = float(quantity)
         self.chosen_strategy = chosen_strategy
         self.client = Client(public_key, private_key)
-        self.account = self.client.get_account()
-        self.strategy = create_strategy_instance_from_string(chosen_strategy, pair, interval,
-                                                             lookback_time, 'noStartDate', 'noEndDate', api_key=public_key,
-                                                             api_secret=private_key)
-
-        # variables validation
+        self.is_simulation = is_simulation
+        self.interval = interval
+        # this parameter shouldn't be predefined by the user since the strategy is highly dependent on the correct amount
+        self.lookback_time = '50m'
+        self.strategy = self.get_fresh_data()
         self.error_message = self.validate_inputs()
+        # create the csv file for the trade output
+        f = open('trades.csv', 'w')
+        self.writer = csv.writer(f)
+        self.writer.writerow(Constants.TRADE_OUTPUT_HEADER)
+
         if self.error_message.strip() != "":
             print(self.error_message)
             return
-        #order = self.client.create_order(symbol=pair, side='BUY', type='MARKET', quantity=10)
-        print(self.client.get_symbol_info("HNTUSDT"))
-        #print(order)
-        # # initialize trading bot
-        # while True:
-        #     self.apply_strategy(pair, 0.0001)
-        #     time.sleep(0.5)
+        # print(self.client.get_symbol_info("HNTUSDT"))
 
-    def apply_strategy(self, pair, qty, open_position=False):
-        buy_price = 0
-        self.refreshData()
-        my_string = f'current close is: ' + str(self.strategy.df.Close.iloc[-1])
-        st.write(my_string)
+        # initialize trading bot
+        # print("Trading Strategy initialized in 3 ...")
+        # time.sleep(1)
+        # print("2 ...")
+        # time.sleep(1)
+        # print("1 ...")
+        # time.sleep(1)
+        # print("Go .. !!!")
+        while True:
+            self.apply_strategy()
+            time.sleep(0.5)
+
+    def apply_strategy(self, open_position=False):
+        self.buy_price = 0
+        self.strategy = self.get_fresh_data()
+        st.dataframe(self.strategy.df)
+        st.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
         print(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
-        # rowsFOrBuy = self.strategy.getBuyDatesForTradingBot()
-        # print(rowsFOrBuy)
         if self.strategy.df.Buy.iloc[-1]:
-            try:
-                order = self.client.create_order(symbol=pair, side='BUY', type='MARKET', quantity=qty)
-                print(order)
-            except BinanceAPIException as e:
-                print(e)
-                return
-            buy_price = float(order['fills'][0]['price'])
+            print("Position OPEN")
+            self.create_order(side="BUY")
             open_position = True
         while open_position:
             time.sleep(0.5)
-            self.refreshData()
+            self.strategy = self.get_fresh_data()
             print(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
-            print(f'Target price is: ' + str(buy_price * 1.005))
-            print(f'current Stop is: ' + str(buy_price * 0.998))
-            if self.strategy.df.Close[-1] <= buy_price * 0.995 or self.strategy.df.Close[-1] >= 1.005 * buy_price:
-                try:
-                    order = self.client.create_order(symbol=pair, side='SELL', type='MARKET', quantity=qty)
-                    print(order)
-                    break
-                except BinanceAPIException as e:
-                    print(e)
-                    return
+            print(f'Target price is: ' + str(self.buy_price * 1.005))
+            print(f'current Stop is: ' + str(self.buy_price * 0.998))
+            if self.strategy.df.Close[-1] <= self.buy_price * 0.995 or self.strategy.df.Close[-1] >= 1.005 * self.buy_price:
+                print("Position CLOSED")
+                self.create_order(side="SELL")
+                open_position = False
 
-    def refreshData(self):
-        self.strategy = StochRSIMACD(self.pair, '1m', '10 min', 'noStartDate', 'noEndDate',
-                                     api_key="public", api_secret="private")
+    def get_fresh_data(self):
+        st.write(self.chosen_strategy)
+        st.write(self.pair)
+        st.write(self.interval)
+        st.write(self.lookback_time)
+        return create_strategy_instance_from_string(self.chosen_strategy, self.pair, self.interval,
+                                                    self.lookback_time, Constants.NO_START_DATE, Constants.NO_END_DATE,
+                                                    api_key=self.public_key,
+                                                    api_secret=self.private_key)
+
+    def create_test_order(self):
+        order_dict = self.client.create_test_order(symbol=self.pair, side='BUY', type='MARKET',
+                                                   quantity=self.usd_amount)
+        if not order_dict:
+            return ""
+        else:
+            return str(order_dict)
+
+    # Helper functions
+    # ---------------
 
     def check_quantity(self):
         info = self.client.get_symbol_info(self.pair)
         min_quantity = float(info["filters"][2]["minNotional"])
-        if self.quantity < min_quantity:
+        if self.usd_amount < min_quantity:
             return f"The quantity provided is not enough. The minimum amount in USD is: {min_quantity}"
         return ""
+
+    def validate_inputs(self):
+        error_message = ""
+        error_message += self.check_strategy_exists() + "\n"
+        error_message += self.check_quantity() + "\n"
+        # error_message += self.create_test_order() + "\n"
+        return error_message
 
     def check_strategy_exists(self):
         if self.chosen_strategy not in class_names:
             return "Something wrong with the strategy Name"
         return ""
 
-    def create_test_order(self):
-        order_dict = self.client.create_test_order(symbol=self.pair, side='BUY', type='MARKET', quantity=self.quantity)
-        if not order_dict:
-            return ""
+    def get_quantity(self):
+        """
+        Calculate the amount of the crypto is being bought from the price and the USD amount invested
+        :return: how many cryptocurrency are being bought
+        """
+        return self.usd_amount / self.strategy.df.Open.iloc[-1]
+
+    def write_toCSV(self, side):
+        curr_time = datetime.datetime.now()
+        symbol = self.pair
+        price = self.strategy.df.Open.iloc[-1]
+        quantity = self.get_quantity()
+        usd_amount = self.usd_amount
+        self.writer.writerow([curr_time, symbol, price, quantity, usd_amount, side])
+
+    def create_order(self, side):
+        if self.is_simulation:
+            self.write_toCSV(side)
+            self.buy_price = self.strategy.df.Open[-1]
         else:
-            return str(order_dict)
+            try:
+                order = self.client.create_order(symbol=self.pair, side=side, type='MARKET', quantity=self.get_quantity())
+                print(order)
+            except BinanceAPIException as e:
+                print(e)
+                return
+            self.buy_price = float(order['fills'][0]['price'])
 
-    def validate_inputs(self):
-        error_message = ""
-        error_message += self.check_strategy_exists() + "\n"
-        error_message += self.check_quantity() + "\n"
-        error_message += self.create_test_order() + "\n"
-        return error_message
 
 
-engine = db.create_engine("sqlite:///test.db")
-metadata = db.MetaData()
-print(metadata.tables.keys())
-
-# test = TradingBot("BTCBUSD", "StochRSIMACD", 10, "1m", '1000 min', api_key, api_secret)
+test = TradingBot("AXSBUSD", "MeanReversion", 10, "1m", is_simulation=True)
