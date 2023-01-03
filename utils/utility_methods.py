@@ -43,7 +43,7 @@ def get_strategy_class_names() -> list[str]:
     :return:  a list with the strategy classnames
     """
     class_names = []
-    directory = os.path.join("..", "..", "AlgoTrading", "strategies")
+    directory = os.path.join("AlgoTrading", "strategies")
     for filename in os.listdir(directory):
         if filename.endswith(".py"):
             with open(os.path.join(directory, filename)) as topo_file:
