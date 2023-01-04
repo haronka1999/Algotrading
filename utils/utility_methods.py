@@ -1,12 +1,3 @@
-"""
---------------------  Revision History: ----------------------------------------
-# 2022-11-24    -   Class created
---------------------------------------------------------------------------------
-Description:
-    Implementing helper functions for UI
----------------------------------------------------------------------------
-"""
-
 from strategies import bollinger_band, mean_reversion, regression_models, stoch_RSI_MACD
 import re
 import os
@@ -17,6 +8,7 @@ from utils.constants import Constants
 from utils.get_historical_data import GetHistoricalData
 import requests
 import pandas as pd
+
 
 def get_fear_and_greed_DF() -> pd.DataFrame:
     """
@@ -37,23 +29,23 @@ def get_fear_and_greed_DF() -> pd.DataFrame:
     df = df[::-1]
     return df
 
-def get_strategy_class_names() -> list[str]:
+
+def get_strategy_class_names(path) -> list[str]:
     """
-    use for generating class names so the User can see in the UI
-    :return:  a list with the strategy classnames
+    Generates class names so the User can see in the UI
+    :param path:  the relative path from the invocation path to strategies
+    :return:
     """
     class_names = []
-    directory = os.path.join("strategies")
-    for filename in os.listdir(directory):
+    for filename in os.listdir(path):
         if filename.endswith(".py"):
-            with open(os.path.join(directory, filename)) as topo_file:
+            with open(os.path.join(path, filename)) as topo_file:
                 # retrieve the className of the file:
                 class_names.append(re.search("class (.*)(Strategy)", topo_file.read()).group(1)[:-1])
 
     while "" in class_names:
         class_names.remove("")
     return class_names
-
 
 
 def get_crypto_prices(ticker_list: list) -> pd.DataFrame:
@@ -119,7 +111,7 @@ def create_strategy_instance_from_string(p_strategy, ticker_symbol, interval, lo
         return None
 
 
-def validateInputs(ticker_symbol, interval):
+def validate_inputs(ticker_symbol, interval):
     if ticker_symbol == "":
         return "Ticker  field is empty"
     if any(not c.isalnum() for c in ticker_symbol) and ticker_symbol.isnumeric():
@@ -132,6 +124,16 @@ def validateInputs(ticker_symbol, interval):
         return "The Interval is not in correct format"
     return ""
 
+
+def submit_form(ticker_symbol,interval):
+    if st.button('Submit'):
+        error = validate_inputs(ticker_symbol, interval)
+        if error != "":
+            st.error(error)
+            return None
+        else:
+            st.write("The given inputs are correct please see the charts below: ")
+            return "Good"
 
 def generate_articles():
     item_attr_map = {

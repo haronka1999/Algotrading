@@ -10,7 +10,7 @@ class Constants:
     NO_LOOKBACK_TIME = "-1"
     NO_START_DATE = "noStartDate"
     NO_END_DATE = "noEndDate"
-    LOOKBACK_TIME_FOR_BOTS = "5m"
+    LOOKBACK_TIME_FOR_BOTS = "50m"
     DEFAULT_STRATEGY_STR = "Choose"
     DATE_FORMAT = '%Y-%m-%d'
 

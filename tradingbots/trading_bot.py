@@ -3,12 +3,9 @@ import datetime
 from binance import Client
 from binance.exceptions import BinanceAPIException
 from utils.constants import Constants
-from utils.utility_methods import create_strategy_instance_from_string, get_strategy_class_names
+from utils.utility_methods import create_strategy_instance_from_string
 import streamlit as st
 import csv
-
-class_names = get_strategy_class_names()
-
 
 class TradingBot:
     def __init__(self, pair, chosen_strategy, quantity, interval, public_key="", private_key="", is_simulation=True):
@@ -23,7 +20,7 @@ class TradingBot:
         self.is_simulation = is_simulation
         self.interval = interval
         # this parameter shouldn't be predefined by the user since the strategy is highly dependent on the correct amount
-        self.lookback_time = '50m'
+        self.lookback_time = Constants.LOOKBACK_TIME_FOR_BOTS
         self.strategy = self.get_fresh_data()
         self.error_message = self.validate_inputs()
         # create the csv file for the trade output
@@ -70,10 +67,10 @@ class TradingBot:
                 open_position = False
 
     def get_fresh_data(self):
-        st.write(self.chosen_strategy)
-        st.write(self.pair)
-        st.write(self.interval)
-        st.write(self.lookback_time)
+        # st.write(self.chosen_strategy)
+        # st.write(self.pair)
+        # st.write(self.interval)
+        # st.write(self.lookback_time)
         return create_strategy_instance_from_string(self.chosen_strategy, self.pair, self.interval,
                                                     self.lookback_time, Constants.NO_START_DATE, Constants.NO_END_DATE,
                                                     api_key=self.public_key,
@@ -99,15 +96,9 @@ class TradingBot:
 
     def validate_inputs(self):
         error_message = ""
-        error_message += self.check_strategy_exists() + "\n"
         error_message += self.check_quantity() + "\n"
-        # error_message += self.create_test_order() + "\n"
         return error_message
 
-    def check_strategy_exists(self):
-        if self.chosen_strategy not in class_names:
-            return "Something wrong with the strategy Name"
-        return ""
 
     def get_quantity(self):
         """
@@ -139,4 +130,4 @@ class TradingBot:
 
 
 
-test = TradingBot("AXSBUSD", "MeanReversion", 10, "1m", is_simulation=True)
+#test = TradingBot("AXSBUSD", "MeanReversion", 10, "1m", is_simulation=True)

@@ -1,6 +1,7 @@
 """
 Use this script to access the Trading functionality (simulation and real)
 """
+import os
 import sys
 import time
 
@@ -8,7 +9,7 @@ from binance import Client
 
 from utils.utility_methods import get_strategy_class_names
 
-class_names = get_strategy_class_names()
+class_names = get_strategy_class_names(path=os.path.join("strategies"))
 
 
 def validate_number(number):
@@ -21,7 +22,8 @@ def validate_number(number):
 
 
 def get_simulation():
-    print(" --- Please Choose if you want to trade with real money or just simulation ---\n1 - Simulation\n2 - Real Money")
+    print(
+        " --- Please Choose if you want to trade with real money or just simulation ---\n1 - Simulation\n2 - Real Money")
     input_str = input(">> Your selection: ")
     simulation_nmb = validate_number(input_str)
     print(f"--> You have selected: {simulation_nmb}")
@@ -77,12 +79,14 @@ def get_amount(p_pair):
 
 def get_interval():
     interval_types = ["1m", "5m", "15m", "30m", "1h", "4h"]
-    print(f"--- Please choose on what interval should data be pulled\n you can choose from the following list: {interval_types} ---")
+    print(
+        f"--- Please choose on what interval should data be pulled\n you can choose from the following list: {interval_types} ---")
     chosen_interval = input(">> Your selection: ")
     if chosen_interval not in interval_types:
         print("You have chosen wrong interval")
         sys.exit()
     return chosen_interval
+
 
 def get_simulation_str():
     if simulation == 1:
@@ -92,13 +96,15 @@ def get_simulation_str():
     else:
         return "Something is wrong"
 
+
 def get_keys(p_simulation):
     public_k, private_k = "", ""
     if p_simulation == 2:
         print(" --- Please give your credentials to Binance")
         public_k = input(">> public key: ")
         private_k = input(">> private key: ")
-    return public_k,private_k
+    return public_k, private_k
+
 
 print("\t\t\t<<<WELCOME IN OUR TRADING APP>>>")
 print("<<<To launch your bot please provide the necessary inputs>>>\n")
@@ -108,7 +114,7 @@ strategy = get_strategy()
 amount = get_amount(pair)
 interval = get_interval()
 simulation = get_simulation()
-public_key,private_key = get_keys(simulation)
+public_key, private_key = get_keys(simulation)
 simulation_str = get_simulation_str()
 
 print("\n------------------------\n"
@@ -118,7 +124,6 @@ print("\n------------------------\n"
       f"\t- Amount in USD: {amount}\n"
       f"\t- Pulling interval: {interval}\n"
       f"\t- Trade type: {simulation_str} ")
-
 
 input1 = input("Please review and press ENTER: ")
 if input1 == "":
