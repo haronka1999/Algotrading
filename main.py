@@ -28,9 +28,9 @@ def is_simulation():
     input_str = input(">> Your selection: ")
     simulation_nmb = validate_number(input_str)
     print(f"--> You have selected: {simulation_nmb}")
-    if simulation_nmb != 1:
+    if simulation_nmb == 1:
         return True
-    elif simulation_nmb != 2:
+    elif simulation_nmb == 2:
         return False
     else:
         print("Error input - selecting trading type")
