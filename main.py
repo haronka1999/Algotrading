@@ -7,6 +7,7 @@ import time
 
 from binance import Client
 
+from tradingbots.trading_bot import TradingBot
 from utils.utility_methods import get_strategy_class_names
 
 class_names = get_strategy_class_names(path=os.path.join("strategies"))
@@ -21,16 +22,19 @@ def validate_number(number):
     return number
 
 
-def get_simulation():
+def is_simulation():
     print(
         " --- Please Choose if you want to trade with real money or just simulation ---\n1 - Simulation\n2 - Real Money")
     input_str = input(">> Your selection: ")
     simulation_nmb = validate_number(input_str)
     print(f"--> You have selected: {simulation_nmb}")
-    if simulation_nmb != 1 and simulation_nmb != 2:
+    if simulation_nmb != 1:
+        return True
+    elif simulation_nmb != 2:
+        return False
+    else:
         print("Error input - selecting trading type")
         sys.exit()
-    return simulation_nmb
 
 
 def get_strategy():
@@ -41,10 +45,10 @@ def get_strategy():
     input_str = input(">> Your selection: ")
     strategy_nmb = validate_number(input_str)
     if strategy_nmb < 1 or strategy_nmb > len(class_name_dict):
-        print("Error input")
+        print("Error: You have chosen invalid strategy number")
         sys.exit()
     print(f"--> You have selected {class_name_dict[strategy_nmb]}\n")
-    return {class_name_dict[strategy_nmb]}
+    return class_name_dict[strategy_nmb]
 
 
 def get_pair():
@@ -89,12 +93,9 @@ def get_interval():
 
 
 def get_simulation_str():
-    if simulation == 1:
+    if simulation:
         return "Simulation"
-    elif simulation == 2:
-        return "Real Money"
-    else:
-        return "Something is wrong"
+    return "Real Money"
 
 
 def get_keys(p_simulation):
@@ -113,7 +114,7 @@ pair = get_pair()
 strategy = get_strategy()
 amount = get_amount(pair)
 interval = get_interval()
-simulation = get_simulation()
+simulation = is_simulation()
 public_key, private_key = get_keys(simulation)
 simulation_str = get_simulation_str()
 
@@ -127,7 +128,14 @@ print("\n------------------------\n"
 
 input1 = input("Please review and press ENTER: ")
 if input1 == "":
-    print(f"Trading bot will be initialized in {time.sleep(1)} 3 ... {time.sleep(1)} 2... {time.sleep(1)}  1... ")
+    print(f"Trading bot will be initialized in 3 seconds ...")
+    time.sleep(1)
+    print("...")
+    time.sleep(1)
+    print("...")
+    time.sleep(1)
+    print("...")
+    tradingbot = TradingBot(pair, strategy, amount, interval, public_key, private_key, simulation)
 else:
     print("Program closed")
     sys.exit()

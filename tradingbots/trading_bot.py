@@ -4,7 +4,6 @@ from binance import Client
 from binance.exceptions import BinanceAPIException
 from utils.constants import Constants
 from utils.utility_methods import create_strategy_instance_from_string
-import streamlit as st
 import csv
 
 class TradingBot:
@@ -31,16 +30,7 @@ class TradingBot:
         if self.error_message.strip() != "":
             print(self.error_message)
             return
-        # print(self.client.get_symbol_info("HNTUSDT"))
 
-        # initialize trading bot
-        # print("Trading Strategy initialized in 3 ...")
-        # time.sleep(1)
-        # print("2 ...")
-        # time.sleep(1)
-        # print("1 ...")
-        # time.sleep(1)
-        # print("Go .. !!!")
         while True:
             self.apply_strategy()
             time.sleep(0.5)
@@ -48,8 +38,6 @@ class TradingBot:
     def apply_strategy(self, open_position=False):
         self.buy_price = 0
         self.strategy = self.get_fresh_data()
-        st.dataframe(self.strategy.df)
-        st.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
         print(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
         if self.strategy.df.Buy.iloc[-1]:
             print("Position OPEN")
@@ -67,10 +55,6 @@ class TradingBot:
                 open_position = False
 
     def get_fresh_data(self):
-        # st.write(self.chosen_strategy)
-        # st.write(self.pair)
-        # st.write(self.interval)
-        # st.write(self.lookback_time)
         return create_strategy_instance_from_string(self.chosen_strategy, self.pair, self.interval,
                                                     self.lookback_time, Constants.NO_START_DATE, Constants.NO_END_DATE,
                                                     api_key=self.public_key,

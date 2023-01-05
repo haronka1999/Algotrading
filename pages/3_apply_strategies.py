@@ -1,7 +1,5 @@
-import streamlit as st
 import os
 import streamlit as st
-from tradingbots.trading_bot import TradingBot
 from utils import utility_methods
 from utils.constants import Constants
 from utils.utility_methods import get_strategy_class_names
@@ -12,13 +10,13 @@ class AppyStrategyUI:
     """
     Responsible for encapsulating and displaying the UI for launching trading Bots
     """
-
     def __init__(self):
         self.private_key = ""
         self.public_key = ""
         self.quantity = ""
         self.ticker_symbol = ""
         self.interval = ""
+        self.is_simulation = True
         self.class_names = get_strategy_class_names(path=os.path.join("strategies"))
         self.class_names.insert(0, Constants.DEFAULT_STRATEGY_STR)
 
@@ -28,6 +26,7 @@ class AppyStrategyUI:
         self.quantity = st.number_input('Choose the amount of USD dollars to be invested:')
         self.public_key = st.text_input('Please enter your Binance Public Key')
         self.private_key = st.text_input('Please enter your Binance Private Key')
+
 
 
 st.write("Hello")
