@@ -81,6 +81,7 @@ class StochRSIMACD(Strategy):
         if cut:
             self.buydates = self.buydates[:-cut]
             self.buyprices = self.buyprices[:-cut]
+            self.df['Buy'] = self.df['Buy'][:-cut]
 
         self.create_actual_trades()
 

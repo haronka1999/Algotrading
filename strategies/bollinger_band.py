@@ -15,12 +15,14 @@ class BollingerBand(Strategy):
     Middle: SMA
     Down: SMA -2*STD
 
-    This measure volatility but most importantly overbuying and overselling
+    Note:
+        - measure only volatility but most importantly overbuying and overselling
+        - it should be used with other tech indicators
 
-    and it should be used with other tech indicators
-
-    Buying strategy:
-    In this example we are selling when the upper trend is crossed, and we are buying when the down is crossed
+    Buy signal
+        - when Close price is below the lower band
+    Sell signal:
+         - when Close price is abowe the higher band
 
     Problem is you can have more buy signal than sell signal ( vice versa )
     We handle this the following way:
@@ -50,14 +52,18 @@ class BollingerBand(Strategy):
         self.df['SMA'] = self.df.Close.rolling(window=20).mean()
         self.df['upper'] = self.df.SMA + 2 * self.df.STD
         self.df['lower'] = self.df.SMA - 2 * self.df.STD
-
-        self.df['Buy'] = np.where(self.df.lower > self.df.Close, 1, 0)
-        self.df['Sell'] = np.where(self.df.upper < self.df.Close, 1, 0)
+        # initilize only for zeros, later we will assign to the valid places
+        self.df['Buy'] = 0
+        self.df['Sell'] = 0
         self.choose_signals()
         self.df = self.df.dropna()
 
 
     def choose_signals(self):
+        """
+        We make sure that the strategy will not use overlapping signals,so we have to filter out
+        :return: -
+        """
         open_pos = False
         # getting only real trades loop through the df
         for i in range(len(self.df)):
@@ -66,18 +72,22 @@ class BollingerBand(Strategy):
                 if not open_pos:
                     self.buydates.append(self.df.index[i])
                     self.buyprices.append(self.df.iloc[i].Close)
+                    self.df["Buy"].iloc[i] = 1
                     open_pos = True
             # selling pos
             elif self.df.upper[i] < self.df.Close[i]:
                 if open_pos:
                     self.selldates.append(self.df.index[i])
                     self.sellprices.append(self.df.iloc[i].Close)
+                    self.df["Sell"].iloc[i] = 1
                     open_pos = False
 
         cut = len(self.buydates) - len(self.selldates)
         if cut:
             self.buydates = self.buydates[:-cut]
             self.buyprices = self.buyprices[:-cut]
+            self.df['Buy'] = self.df['Buy'][:-cut]
+
 
     def plot(self):
         plt.figure(figsize=(25, 6))
