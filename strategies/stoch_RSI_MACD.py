@@ -40,16 +40,6 @@ class StochRSIMACD(Strategy):
         self.apply_technicals()
         self.decide()
 
-    def get_trigger(self, lags, buy=True):
-        dfx = pd.DataFrame()
-        for i in range(lags + 1):
-            if buy:
-                mask = (self.df['%K'].shift(i) < 20) & (self.df['%D'].shift(i) < 20)
-            else:
-                mask = (self.df['%K'].shift(i) > 80) & (self.df['%D'].shift(i) > 80)
-            dfx = pd.concat([dfx, pd.DataFrame([mask])], ignore_index=True)
-            # dfx = dfx.append(mask, ignore_index=True)
-        return dfx.sum(axis=0)
 
     # check if the trigger is fulfilled and buying condition fulfilled
     def decide(self):
@@ -76,14 +66,24 @@ class StochRSIMACD(Strategy):
                         self.selldates.append(self.df.iloc[i + num + 1].name)
                         break
 
+        self.create_actual_trades()
+
         # if I have one extra buying date delete it
         cut = len(self.buydates) - len(self.selldates)
         if cut:
             self.buydates = self.buydates[:-cut]
             self.buyprices = self.buyprices[:-cut]
-            self.df['Buy'] = self.df['Buy'][:-cut]
 
-        self.create_actual_trades()
+    def get_trigger(self, lags, buy=True):
+        dfx = pd.DataFrame()
+        for i in range(lags + 1):
+            if buy:
+                mask = (self.df['%K'].shift(i) < 20) & (self.df['%D'].shift(i) < 20)
+            else:
+                mask = (self.df['%K'].shift(i) > 80) & (self.df['%D'].shift(i) > 80)
+            dfx = pd.concat([dfx, pd.DataFrame([mask])], ignore_index=True)
+            # dfx = dfx.append(mask, ignore_index=True)
+        return dfx.sum(axis=0)
 
     def apply_technicals(self):
         self.df['%K'] = ta.momentum.stoch(self.df.High, self.df.Low, self.df.Close, window=14, smooth_window=3)
