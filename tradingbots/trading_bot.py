@@ -24,6 +24,7 @@ class TradingBot:
         self.error_message = self.validate_inputs()
         # create the csv file for the trade output
         f = open('trades.csv', 'w')
+        self.log = open("log.txt", "w")
         self.writer = csv.writer(f)
         self.writer.writerow(Constants.TRADE_OUTPUT_HEADER)
 
@@ -39,8 +40,10 @@ class TradingBot:
         self.buy_price = 0
         self.strategy = self.get_fresh_data()
         print(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
+        self.log.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
         if self.strategy.df.Buy.iloc[-1]:
             print("Position OPEN")
+            self.log.write("Position OPEN\n")
             self.create_order(side="BUY")
             open_position = True
         while open_position:
@@ -51,6 +54,10 @@ class TradingBot:
             print(f'current Stop is: ' + str(self.buy_price * 0.998))
             if self.strategy.df.Sell.iloc[-1]:
                 print("Position CLOSED")
+                self.log.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
+                self.log.write(f'Target price is: ' + str(self.buy_price * 1.005) +'\n')
+                self.log.write(f'current Stop is: ' + str(self.buy_price * 0.998) + '\n')
+                self.log.write("Position CLOSED\n")
                 self.create_order(side="SELL")
                 open_position = False
 
