@@ -72,14 +72,14 @@ class BollingerBand(Strategy):
                 if not open_pos:
                     self.buydates.append(self.df.index[i])
                     self.buyprices.append(self.df.iloc[i].Close)
-                    self.df["Buy"].iloc[i] = 1
+                    self.df.iloc[i,self.df.columns.get_loc('Buy')] = 1
                     open_pos = True
             # selling pos
             elif self.df.upper[i] < self.df.Close[i]:
                 if open_pos:
                     self.selldates.append(self.df.index[i])
                     self.sellprices.append(self.df.iloc[i].Close)
-                    self.df["Sell"].iloc[i] = 1
+                    self.df.iloc[i,self.df.columns.get_loc('Sell')] = 1
                     open_pos = False
 
         cut = len(self.buydates) - len(self.selldates)

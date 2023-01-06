@@ -66,13 +66,13 @@ class StochRSIMACD(Strategy):
                         self.selldates.append(self.df.iloc[i + num + 1].name)
                         break
 
-        self.create_actual_trades()
-
         # if I have one extra buying date delete it
         cut = len(self.buydates) - len(self.selldates)
         if cut:
             self.buydates = self.buydates[:-cut]
             self.buyprices = self.buyprices[:-cut]
+
+        self.create_actual_trades()
 
     def get_trigger(self, lags, buy=True):
         dfx = pd.DataFrame()

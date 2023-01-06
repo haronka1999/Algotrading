@@ -42,22 +42,16 @@ class TradingBot:
         print(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
         self.log.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
         if self.strategy.df.Buy.iloc[-1]:
-            print("Position OPEN")
-            self.log.write("Position OPEN\n")
+            print("OPEN")
+            self.log.write(f"Position OPEN at {datetime.datetime.now()}\n")
             self.create_order(side="BUY")
             open_position = True
         while open_position:
             time.sleep(1)
             self.strategy = self.get_fresh_data()
-            print(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
-            print(f'Target price is: ' + str(self.buy_price * 1.005))
-            print(f'current Stop is: ' + str(self.buy_price * 0.998))
+            self.log.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
             if self.strategy.df.Sell.iloc[-1]:
-                print("Position CLOSED")
-                self.log.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
-                self.log.write(f'Target price is: ' + str(self.buy_price * 1.005) +'\n')
-                self.log.write(f'current Stop is: ' + str(self.buy_price * 0.998) + '\n')
-                self.log.write("Position CLOSED\n")
+                self.log.write(f'Position CLOSED at {datetime.datetime.now()} at price of : ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
                 self.create_order(side="SELL")
                 open_position = False
 
