@@ -132,7 +132,6 @@ def submit_form(ticker_symbol,interval):
             st.error(error)
             return None
         else:
-            st.write("The given inputs are correct please see the charts below: ")
             return "Good"
 
 def generate_articles():

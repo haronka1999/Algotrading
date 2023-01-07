@@ -78,6 +78,7 @@ elif current_strategy_name != Constants.DEFAULT_STRATEGY_STR:
         backtestUI.end_date = end_date
 
     if utility_methods.submit_form(backtestUI.ticker_symbol, backtestUI.interval) is not None:
+        st.write("The given inputs are correct please see the charts below: ")
         with st.spinner('Wait for it...'):
             backtestUI.retrieve_strategy_object()
         if backtestUI.strategy is not None:

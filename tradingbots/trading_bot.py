@@ -1,5 +1,7 @@
 import time
 import datetime
+
+import streamlit as st
 from binance import Client
 from binance.exceptions import BinanceAPIException
 from utils.constants import Constants
@@ -27,7 +29,7 @@ class TradingBot:
         self.log = open("log.txt", "w")
         self.writer = csv.writer(f)
         self.writer.writerow(Constants.TRADE_OUTPUT_HEADER)
-
+        st.write(f'Current close is: {self.strategy.df.Close[-1]}')
         if self.error_message.strip() != "":
             print(self.error_message)
             return
@@ -40,17 +42,21 @@ class TradingBot:
         self.buy_price = 0
         self.strategy = self.get_fresh_data()
         print(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
+        st.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]))
         self.log.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
         if self.strategy.df.Buy.iloc[-1]:
             print("OPEN")
+            st.write(f"Position OPEN at {datetime.datetime.now()}\n")
             self.log.write(f"Position OPEN at {datetime.datetime.now()}\n")
             self.create_order(side="BUY")
             open_position = True
         while open_position:
             time.sleep(1)
             self.strategy = self.get_fresh_data()
+            st.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
             self.log.write(f'current close is: ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
             if self.strategy.df.Sell.iloc[-1]:
+                st.write(f'Position CLOSED at {datetime.datetime.now()} at price of : ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
                 self.log.write(f'Position CLOSED at {datetime.datetime.now()} at price of : ' + str(self.strategy.df.Close.iloc[-1]) + "\n")
                 self.create_order(side="SELL")
                 open_position = False

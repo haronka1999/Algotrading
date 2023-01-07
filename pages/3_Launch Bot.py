@@ -32,12 +32,13 @@ class AppyStrategyUI:
         else:
             self.is_simulation = True
 
-
-st.write("Hello")
 applyUI = AppyStrategyUI()
 current_strategy = st.selectbox('Choose a predefined strategy', help="Choose", options=applyUI.class_names)
-if current_strategy != Constants.DEFAULT_STRATEGY_STR:
+if current_strategy == 'RegressionModels':
+    st.write("Implementation is coming soon ...")
+elif current_strategy != Constants.DEFAULT_STRATEGY_STR:
     applyUI.retrieve_inputs()
     if utility_methods.submit_form(applyUI.ticker_symbol, applyUI.interval) is not None:
-        st.write("The trading bot is getting initialized ... see log.txt for further details")
-        strategy = TradingBot(applyUI.ticker_symbol, current_strategy, applyUI.quantity, applyUI.interval, applyUI.public_key, applyUI.private_key, applyUI.is_simulation)
+        st.write("The trading bot is getting initialized ... If you are running from your machine check log.txt and trades.csv for further details")
+        trading_strategy = TradingBot(applyUI.ticker_symbol, current_strategy, applyUI.quantity, applyUI.interval, applyUI.public_key, applyUI.private_key, applyUI.is_simulation)
+
