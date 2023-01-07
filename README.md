@@ -21,7 +21,7 @@ A simple web app was written to easily access every functionalities.
 <br/>
 It uses the https://streamlit.io python library.
 <br/> 
-For access the program please follow this link: http://3.8.28.227:8501/
+To access the web application, please follow this link: http://3.8.28.227:8501/
 <br/>
 <br/>
 
