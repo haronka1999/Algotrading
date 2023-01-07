@@ -1,6 +1,12 @@
 import pandas as pd
 
-def get_formatted_series(series):
+
+def get_formatted_series(series: pd.Series) -> pd.Series:
+    """
+    The function will reformulate the given series for a  better visualization for displaying the profits
+    :param series:  the series which will be formatted
+    :return:  the formatted series
+    """
     index_name = []
     for i in range(len(series)):
         # reformat index
@@ -36,4 +42,3 @@ class Backtest:
     def get_cumulative_returns(self):
         cum_return = (self.relative_returns + 1).prod() - 1
         return str(round(cum_return * 100, 2)) + " %"
-
