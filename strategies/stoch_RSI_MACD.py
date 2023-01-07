@@ -57,11 +57,12 @@ class StochRSIMACD(Strategy):
         for i in range(len(self.df) - 1):
             # if my buying column contains a signal
             if self.df.Buy.iloc[i]:
+                # get the next buying signal, because we only can buy in the next timestep
                 self.buydates.append(self.df.iloc[i + 1].name)
                 # when I have appended a date I'm checking when my selling date is fulfilled
                 # num =  number of iteration
                 # j = the value of the Sell column in the numth iteration
-                for num, j in enumerate(self.df.Sell[i:]):
+                for num, j in enumerate(self.df.Sell[i:len(self.df)-1]):
                     if j:
                         self.selldates.append(self.df.iloc[i + num + 1].name)
                         break
