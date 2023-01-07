@@ -24,13 +24,11 @@ class BacktestUI:
         self.class_names.insert(0, Constants.DEFAULT_STRATEGY_STR)
         self.strategy = None
 
-
     def retrieve_inputs(self):
         self.ticker_symbol = st.text_input('Ticker symbol:', placeholder='ex. BTCUSDT, ETHUSDT, ADAUSDT, etc')
         self.interval = st.text_input('Candle chart interval:', placeholder='ex. 15m, 30m, 1h, 4h, 6h, 24h')
         self.retrieve_method = st.radio('Choose data retrieval method: lookback hours or date range: ',
                                    ('lookback', 'dateRange'))
-
 
     def retrieve_strategy_object(self):
         self.strategy = create_strategy_instance_from_string(self.current_strategy_name, self.ticker_symbol,
