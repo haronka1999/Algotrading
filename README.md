@@ -13,7 +13,7 @@ These strategies are not  highly profitable. It is possible to make some profit,
 
 ## Using the Software
 
-There are two possibilites to access the functionalities: 
+There are two possibilities to access the functionalities: 
 <br/>
 1. Web Application 
 <br>
