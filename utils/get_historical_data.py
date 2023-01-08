@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 from utils.constants import Constants
 from binance.client import Client
@@ -38,7 +39,22 @@ class GetHistoricalData:
         :param api_secret:  the secret key generated from binance (if not given, trading is not possible)
         """
         self.frame = pd.DataFrame()
-        self.client = Client(api_key, api_secret)
+        while True:
+            try:
+
+                self.client = Client(api_key, api_secret)
+                # if the ping returns an empty dictionary the connection is established
+                # otherwise an exception will be raised
+                if not self.client.ping():
+                    break
+
+            except Exception as e:
+                print("Error connection to client ", e)
+                print("Retry in 5 seconds ... ")
+                time.sleep(5)
+                pass
+
+
         self.ticker = ticker
         self.interval = interval
         self.lookback_time = lookback_time
@@ -84,5 +100,3 @@ class GetHistoricalData:
         self.frame.index = pd.to_datetime(self.frame.index, unit='ms')
         self.frame.index = self.frame.index + timedelta(hours=2)
         self.frame = self.frame.astype(float)
-
-# he = GetHistoricalData(ticker="ADAUSDT", startDate="2022-05-12", endDate=today, lookbackHours="-1",interval="1d")
